@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/LightSteelBlue"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/cardtest"
+        android:textSize="@dimen/main_dimension" />
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/returnmain"
+        android:textSize="@dimen/activity_vertical_margin" />
+
+    <Button
+        android:id="@+id/btnGetRandom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/Read" />
+
+    <Button
+        android:id="@+id/btnWrite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnGetRandom"
+        android:layout_below="@+id/btnGetRandom"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/ellipse_button"
+        android:text="@string/Write" />
+
+    <TextView
+        android:id="@+id/tvTestResault"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvTestDate"
+        android:layout_below="@+id/tvTestDate"
+        android:layout_marginTop="28dp"
+        android:background="@color/White"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tvTestResault"
+        android:layout_alignBottom="@+id/tvTestResault"
+        android:layout_alignLeft="@+id/TextView01"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/resault"
+        android:textSize="@dimen/abc_action_bar_title_text_size" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tvTestResault"
+        android:layout_toLeftOf="@+id/tvTestDate"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/returndata"
+        android:textSize="@dimen/abc_action_bar_title_text_size" />
+
+    <TextView
+        android:id="@+id/tvTestDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnWrite"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="35dp"
+        android:background="@color/White"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical"
+        android:textSize="@dimen/abc_action_bar_title_text_size" />
+
+</RelativeLayout>

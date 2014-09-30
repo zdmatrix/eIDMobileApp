@@ -1,16 +1,84 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/LightYellow"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="zdmatrix.hed.eid.eidmobileapp.MainActivity$PlaceholderFragment" >
+    tools:context="zdmatrix.hed.eidmobileapp.container.MainActivity$PlaceholderFragment" >
 
-    <TextView
+    <Button
+        android:id="@+id/btnNewKey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_below="@+id/btneCash"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/NewUKey" />
+
+    <Button
+        android:id="@+id/btneCash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnTest"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/ElectricMoney" />
+
+    <Button
+        android:id="@+id/btnTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/test" />
+
+    <Button
+        android:id="@+id/btnOTP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnNewKey"
+        android:layout_below="@+id/btnNewKey"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/otp" />
+
+    <Button
+        android:id="@+id/btnExit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/exit" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="fill_parent"
+        android:layout_height="66dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/APDUStep1"
+        android:src="@drawable/head" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:text="@string/mainlable"
+        android:textColor="@color/Black"
+        android:textSize="@dimen/main_dimension"
+        android:textStyle="bold"
+        android:typeface="monospace" />
 
 </RelativeLayout>
