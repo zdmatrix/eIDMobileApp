@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/LightSteelBlue"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/returnmain"
+        android:textSize="@dimen/activity_vertical_margin" />
+
+    <Button
+        android:id="@+id/btnLogIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btnReturn"
+        android:layout_below="@+id/etResponseCode"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ellipse_button"
+        android:text="@string/Login" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/otp"
+        android:textSize="@dimen/main_dimension" />
+
+    <Button
+        android:id="@+id/btnChallengeCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="21dp"
+        android:layout_toLeftOf="@+id/tvChallengeCode"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/GenerateChallenge" />
+
+    <EditText
+        android:id="@+id/etResponseCode"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/tvChallengeCode"
+        android:layout_below="@+id/tvChallengeCode"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnLogIn"
+        android:layout_alignLeft="@+id/btnChallengeCode"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/DynamicOrder"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/tvChallengeCode"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignBottom="@+id/btnChallengeCode"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_marginLeft="19dp"
+        android:background="@color/White"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="20sp" />
+
+</RelativeLayout>

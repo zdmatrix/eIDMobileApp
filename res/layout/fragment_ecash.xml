@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/LightSteelBlue"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/ElectricMoney"
+        android:textSize="@dimen/main_dimension" />
+
+    <Button
+        android:id="@+id/btnChallengeCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/Recharge" />
+
+    <EditText
+        android:id="@+id/etResponseCode"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_above="@+id/btnBanlance"
+        android:layout_alignLeft="@+id/editTextRecharge"
+        android:ems="10"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/tvBanlance"
+        android:layout_width="100dp"
+        android:layout_height="45dp"
+        android:layout_alignBottom="@+id/btnBanlance"
+        android:layout_alignLeft="@+id/etResponseCode"
+        android:background="@color/White"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btnBanlance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnLogIn"
+        android:layout_marginTop="40dp"
+        android:layout_toLeftOf="@+id/editTextRecharge"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/BanlanceCash" />
+
+    <EditText
+        android:id="@+id/editTextRecharge"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_alignBaseline="@+id/btnChallengeCode"
+        android:layout_alignBottom="@+id/btnChallengeCode"
+        android:layout_marginLeft="28dp"
+        android:layout_toRightOf="@+id/btnChallengeCode"
+        android:ems="10"
+        android:inputType="numberDecimal" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/btnLogIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextRecharge"
+        android:layout_marginTop="40dp"
+        android:layout_toLeftOf="@+id/editTextRecharge"
+        android:background="@drawable/ellipse_button"
+        android:text="@string/Consume" />
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/ellipse_silvery_147x66"
+        android:text="@string/returnmain"
+        android:textSize="@dimen/activity_vertical_margin" />
+
+</RelativeLayout>

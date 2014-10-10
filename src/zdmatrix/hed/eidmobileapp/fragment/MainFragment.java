@@ -58,9 +58,17 @@ public class MainFragment extends Fragment{
     		if(v == btnExit){
     			getActivity().finish();
     		}
-    		if(v == btnTest){
+    		if(v == btnTest){			
     			TestFragment testfragment = new TestFragment();
     			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, testfragment).commit();
+    		}
+    		if(v == btneCash){
+    			eCashFragment ecashfragment = new eCashFragment();
+    			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ecashfragment).commit();
+    		}
+    		if(v == btnOTP){
+    			OTPFragment otpfragment = new OTPFragment();
+    			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, otpfragment).commit();
     		}
     	}
     }
