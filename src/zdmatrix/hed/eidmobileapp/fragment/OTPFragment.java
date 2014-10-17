@@ -56,7 +56,7 @@ public class OTPFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		View view = inflater.inflate(R.layout.fragment_otp, container, false);
 		
-		btnChallengeCode = (Button)view.findViewById(R.id.btnChallengeCode);
+		btnChallengeCode = (Button)view.findViewById(R.id.btnRecharge);
 		btnChallengeCode.setOnClickListener(new ClickEvent());
 		
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);

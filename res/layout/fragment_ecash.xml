@@ -6,27 +6,6 @@
     android:background="@color/LightSteelBlue"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/ElectricMoney"
-        android:textSize="@dimen/main_dimension" />
-
-    <Button
-        android:id="@+id/btnChallengeCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="50dp"
-        android:background="@drawable/ellipse_silvery_147x66"
-        android:text="@string/Recharge" />
-
     <EditText
         android:id="@+id/etResponseCode"
         android:layout_width="100dp"
@@ -37,12 +16,13 @@
         android:inputType="numberDecimal" />
 
     <TextView
-        android:id="@+id/tvBanlance"
+        android:id="@+id/tvDstAccount"
         android:layout_width="100dp"
         android:layout_height="45dp"
         android:layout_alignBottom="@+id/btnBanlance"
         android:layout_alignLeft="@+id/etResponseCode"
         android:background="@color/White"
+        android:gravity="center"
         android:isScrollContainer="true"
         android:lines="1"
         android:minEms="10"
@@ -51,22 +31,23 @@
 
     <Button
         android:id="@+id/btnBanlance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/btnLogIn"
         android:layout_marginTop="40dp"
         android:layout_toLeftOf="@+id/editTextRecharge"
-        android:background="@drawable/ellipse_silvery_147x66"
-        android:text="@string/BanlanceCash" />
+        android:background="@drawable/rectangle_button"
+        android:text="@string/BanlanceCash"
+        android:textSize="15sp" />
 
     <EditText
         android:id="@+id/editTextRecharge"
         android:layout_width="100dp"
         android:layout_height="48dp"
-        android:layout_alignBaseline="@+id/btnChallengeCode"
-        android:layout_alignBottom="@+id/btnChallengeCode"
+        android:layout_alignBaseline="@+id/btnRecharge"
+        android:layout_alignBottom="@+id/btnRecharge"
         android:layout_marginLeft="28dp"
-        android:layout_toRightOf="@+id/btnChallengeCode"
+        android:layout_toRightOf="@+id/btnRecharge"
         android:ems="10"
         android:inputType="numberDecimal" >
 
@@ -75,23 +56,47 @@
 
     <Button
         android:id="@+id/btnLogIn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/btnRecharge"
         android:layout_below="@+id/editTextRecharge"
         android:layout_marginTop="40dp"
         android:layout_toLeftOf="@+id/editTextRecharge"
-        android:background="@drawable/ellipse_button"
-        android:text="@string/Consume" />
+        android:background="@drawable/rectangle_button"
+        android:text="@string/Consume"
+        android:textSize="15sp" />
 
     <Button
         android:id="@+id/btnReturn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:background="@drawable/ellipse_silvery_147x66"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/rectangle_button"
         android:text="@string/returnmain"
         android:textSize="@dimen/activity_vertical_margin" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/ElectricMoney"
+        android:textSize="@dimen/main_dimension" />
+
+    <Button
+        android:id="@+id/btnRecharge"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="51dp"
+        android:layout_toLeftOf="@+id/textView1"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/Recharge"
+        android:textSize="15sp" />
 
 </RelativeLayout>

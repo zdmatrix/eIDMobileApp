@@ -48,10 +48,10 @@
     <string name="SrcAccount">10位用户帐号</string>
     <string name="DstAccount">10位目的帐号</string>
     <string name="RechargeNum">转账金额</string>
-    <string name="SendDataToCard">交易数据提交可视卡</string>
+    <string name="VerifyData">卡验证数据</string>
     <string name="NewUkeyStep2">二 用户转账交易的数据传输到卡上后，卡中会生成验证图片和一次性验证码，并显示到网银页面上。     用户现在请确认下面图片中的交易信息是否和输入的相同，然后请确认下面图片中的校验码与可视卡屏幕上的数据是否相同。如果以上信息全部相同，则可确认交易数据安全。</string>
     <string name="NewUkeyStep3">三 用户确认数据无误，按可视卡的按钮完成交易</string>
-    <string name="BanlanceCash">卡中余额</string>
+    <string name="BanlanceCash">卡余额</string>
     <string name="newukeyRSAkeypair">一 产生公私钥对，私钥保留，公钥输出显示</string>
     <string name="newukeyconfirm">三 确认图片显示信息和实际交易是否一致</string>
     <string name="newukeyenter">二 输入目的帐户和转账金额</string>
@@ -72,5 +72,11 @@
     <string name="Select">选中</string>
     <string name="mainlable">eID演示平台</string>
     <string name="resault">操作结果：</string>
+    <string name="srcAccountNO">9876543210</string>
+    <string name="dstAccountNO">1234567890</string>
+    <string name="srcAccount">源账户</string>
+    <string name="dstAccount">目的账户</string>
+    <string name="authcode">认证码</string>
+    <string name="confirm">确认</string>
 
 </resources>

@@ -70,6 +70,11 @@ public class MainFragment extends Fragment{
     			OTPFragment otpfragment = new OTPFragment();
     			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, otpfragment).commit();
     		}
+    		if(v == btnNewKey){
+    			NewKeyFragment newkeyfragment = new NewKeyFragment();
+    			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, newkeyfragment).commit();
+    		}
+    		
     	}
     }
     

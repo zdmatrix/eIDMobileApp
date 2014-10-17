@@ -6,44 +6,12 @@
     android:background="@color/LightSteelBlue"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/cardtest"
-        android:textSize="@dimen/main_dimension" />
-
-    <Button
-        android:id="@+id/btnReturn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/ellipse_silvery_147x66"
-        android:text="@string/returnmain"
-        android:textSize="@dimen/activity_vertical_margin" />
-
-    <Button
-        android:id="@+id/btnChallengeCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:background="@drawable/ellipse_silvery_147x66"
-        android:text="@string/Read" />
-
     <Button
         android:id="@+id/btnLogIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnChallengeCode"
-        android:layout_below="@+id/btnChallengeCode"
+        android:layout_alignLeft="@+id/btnRecharge"
+        android:layout_below="@+id/btnRecharge"
         android:layout_marginTop="16dp"
         android:background="@drawable/ellipse_button"
         android:text="@string/Write" />
@@ -102,5 +70,37 @@
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
         android:textSize="@dimen/abc_action_bar_title_text_size" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/btnRecharge"
+        android:layout_marginTop="25dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/cardtest"
+        android:textSize="@dimen/main_dimension" />
+
+    <Button
+        android:id="@+id/btnRecharge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/btnReturn"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/ellipse_button"
+        android:text="@string/Read" />
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/ellipse_button"
+        android:text="@string/returnmain"
+        android:textSize="@dimen/activity_vertical_margin" />
 
 </RelativeLayout>

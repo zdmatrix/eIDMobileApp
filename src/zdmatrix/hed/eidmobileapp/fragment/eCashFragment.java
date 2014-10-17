@@ -1,24 +1,17 @@
 package zdmatrix.hed.eidmobileapp.fragment;
 
-import java.security.PublicKey;
-
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.edimobileapp.data.StaticData;
 import zdmatrix.hed.eid.eidmobileapp.R;
-import zdmatrix.hed.eidmobileapp.fragment.TestFragment.GetRandomThread;
-import zdmatrix.hed.eidmobileapp.fragment.TestFragment.WriteThread;
+import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
+import android.R.integer;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageParser.NewPermissionInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,10 +35,11 @@ public class eCashFragment extends Fragment{
 	String strRechargeData;
 	String strExpenseData;
 	String strBanlance;
-	String resault;
+	String[] resault;
 	
 	int nBanlance;
 	int nRet;
+	boolean bGetBanlance;
 	
 	Handler handler;
 
@@ -59,7 +53,7 @@ public class eCashFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState ){
 		View view = inflater.inflate(R.layout.fragment_ecash, container, false);
 		
-		btnRecharge = (Button)view.findViewById(R.id.btnChallengeCode);
+		btnRecharge = (Button)view.findViewById(R.id.btnRecharge);
 		btnRecharge.setOnClickListener(new ClickEvent());
 		
 		btnExpense = (Button)view.findViewById(R.id.btnLogIn);
@@ -91,46 +85,46 @@ public class eCashFragment extends Fragment{
 			}
 		});
 		
-		tvBanlance = (TextView)view.findViewById(R.id.tvBanlance);
+		tvBanlance = (TextView)view.findViewById(R.id.tvDstAccount);
 		tveCashResault = (TextView)view.findViewById(R.id.tveCashResault);
 		
 		handler = new Handler();
+		
+		resault = new String[2];
+		nBanlance = 0;
+		bGetBanlance = false;
+		
+		nRet = NFCApplication.isSupportNFC(getActivity());
+		if(nRet != NFCMsgCode.nSUPPORT_NFC){
+			resault = FunctionMoudle.ErrorProcess(nRet);
+			handler.post(runnableDisWarning);
+		}
 		
 		return view;		
 	}
 	
 	public class ClickEvent implements View.OnClickListener{
 		@Override
-		public void onClick(View v){
+		public void onClick(View v){	
+			
 			if(v == btnReturn){
 				MainFragment mainFragment = new MainFragment();
 				getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, mainFragment).commit();
 			}else{
-				nRet = NFCApplication.isSupportNFC(getActivity());
-				switch (nRet) {
-				case NFCMsgCode.nNOT_SUPPORT_NFC:
-					resault = "Not Support NFC!";
-					handler.post(runnableDisResault);
-					break;
-				case NFCMsgCode.nNOT_OPEN_NFC:
-//					msg = "#" + String.format("%1$03d", nClickCount) + "  ";
-					resault = "Please Open NFC in Setting First!";
-					handler.post(runnableDisResault);
-					break;
-				case NFCMsgCode.nSUPPORT_NFC:
-					if(v == btnBanlance){
-						new GetBanlanceThread().start();
-					}else if(v == btnRecharge){
+				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
+				if(nRet == NFCMsgCode.nTAG_CONNECT){
+					if(v == btnRecharge){
 						new RechargeThread().start();
 					}else if(v == btnExpense){
 						new ExpenseThread().start();
+					}else if(v == btnBanlance){
+						new GetBanlanceThread().start();
 					}
-					break;
-				default:
-					break;
-				}
-				
-				
+					
+				}else{
+					resault = FunctionMoudle.ErrorProcess(nRet);
+					handler.post(runnableDisWarning);
+				}							
 			}
 		}
 	}
@@ -138,44 +132,82 @@ public class eCashFragment extends Fragment{
 	public class GetBanlanceThread extends Thread{
 		@Override
 		public void run(){
-//			byte[] ret = NFCApplication.DataTransfer(StaticData.bSELECTFILE);
+			resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+				handler.post(runnableDisWarning);
+				bGetBanlance = false;
+			}else{
+				handler.post(runnableDisBanlance);
+				bGetBanlance = true;
+			}
 		}
 	}
 	
 	public class RechargeThread extends Thread{
 		@Override
 		public void run(){
-			if(Integer.parseInt(strRechargeData, 10) + nBanlance > 1000){
-				resault = "充值金额过大，余额请勿超过1000！";	
+			if(strRechargeData == null){
+				resault[StaticData.nSW] = "请输入充值金额";					
 			}else{
-				
+				if(!bGetBanlance){
+					resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
+						resault = FunctionMoudle.BinDataRW(strRechargeData, nBanlance, StaticData.nRECHARGE);
+					}
+				}else{
+					resault = FunctionMoudle.BinDataRW(strRechargeData, nBanlance, StaticData.nRECHARGE);
+				}
 			}
-			handler.post(runnableDisResault);
+			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+				handler.post(runnableDisWarning);
+			}			
 		}
 	}
 	
 	public class ExpenseThread extends Thread{
 		@Override
 		public void run(){
-			if(Integer.parseInt(strExpenseData, 10) < nBanlance){
-				resault = "消费金额过大，超出余额！";
-			}else{
+			if(strExpenseData == null){
+				resault[StaticData.nSW] = "请输入消费金额";
 				
+			}else{
+				if(!bGetBanlance){
+					resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
+						resault = FunctionMoudle.BinDataRW(strExpenseData, nBanlance, StaticData.nEXPENSE);
+					}
+				}else{
+					resault = FunctionMoudle.BinDataRW(strExpenseData, nBanlance, StaticData.nEXPENSE);
+				}
 			}
-			handler.post(runnableDisResault);
+			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+				handler.post(runnableDisWarning);
+			}
+			
+			
 		}
 	}
 	
-	Runnable runnableDisResault = new Runnable() {
+	Runnable runnableDisBanlance = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			tvBanlance.setText(String.format("%1$s", Integer.parseInt(resault[StaticData.nDATA], 16)));
+		}
+	};
+	
+	Runnable runnableDisWarning = new Runnable() {
 		
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
 //			tveCashResault.setText(resault);
-			final ProgressDialog m_Dialog;
 			AlertDialog dlg = new AlertDialog.Builder(getActivity())
             .setTitle("提示信息")
-            .setMessage(resault)       
+            .setMessage(resault[StaticData.nSW])       
             .setView(null)//设置自定义对话框的样式
             .setPositiveButton("确定", //设置"确定"按钮
             new DialogInterface.OnClickListener() //设置事件监听
@@ -189,4 +221,7 @@ public class eCashFragment extends Fragment{
             dlg.show();//显示
 		}
 	};
+	
+	
+	
 }

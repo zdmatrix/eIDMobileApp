@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/LightSteelBlue"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/returnmain"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/NewUKey"
+        android:textSize="@dimen/main_dimension" />
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/DstAccount"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tvDstAccount"
+        android:layout_width="130dp"
+        android:layout_height="24dp"
+        android:layout_below="@+id/textView1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@+id/TextView01"
+        android:background="@color/White"
+        android:gravity="center"
+        android:hint="@string/dstAccountNO"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tvSrcAccount"
+        android:layout_width="100dp"
+        android:layout_height="24dp"
+        android:layout_alignLeft="@+id/tvDstAccount"
+        android:layout_alignRight="@+id/tvDstAccount"
+        android:layout_alignTop="@+id/TextView02"
+        android:background="@color/White"
+        android:gravity="center"
+        android:hint="@string/srcAccountNO"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView01"
+        android:layout_below="@+id/tvDstAccount"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/SrcAccount"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/etTransformerAmount"
+        android:layout_width="100dp"
+        android:layout_height="24dp"
+        android:layout_alignBaseline="@+id/TextView04"
+        android:layout_alignBottom="@+id/TextView04"
+        android:layout_alignLeft="@+id/tvSrcAccount"
+        android:layout_alignRight="@+id/tvSrcAccount"
+        android:background="@color/White"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:textSize="20sp" >
+
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:id="@+id/TextView04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView02"
+        android:layout_below="@+id/tvSrcAccount"
+        android:layout_marginTop="8dp"
+        android:layout_toLeftOf="@+id/textView1"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/RechargeNum"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/TextView05"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView04"
+        android:layout_below="@+id/btnVerifyData"
+        android:layout_marginTop="22dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/srcAccount"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/TextView07"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView05"
+        android:layout_below="@+id/TextView05"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/dstAccount"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/TextView09"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView07"
+        android:layout_below="@+id/TextView07"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/RechargeNum"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/TextView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/TextView09"
+        android:layout_below="@+id/TextView09"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/authcode"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/imgSrcAccount"
+        android:layout_width="192dp"
+        android:layout_height="24dp"
+        android:layout_above="@+id/TextView07"
+        android:layout_alignLeft="@+id/textView1"
+        android:contentDescription="@string/srcAccount"
+        android:src="@drawable/abc_ab_share_pack_holo_light" />
+
+    <ImageView
+        android:id="@+id/imgTransformerAmount"
+        android:layout_width="192dp"
+        android:layout_height="24dp"
+        android:layout_alignLeft="@+id/imgDstAccount"
+        android:layout_below="@+id/imgDstAccount"
+        android:contentDescription="@string/RechargeNum"
+        android:src="@drawable/abc_ab_share_pack_holo_light" />
+
+    <ImageView
+        android:id="@+id/imgAuthCode"
+        android:layout_width="192dp"
+        android:layout_height="24dp"
+        android:layout_alignLeft="@+id/imgTransformerAmount"
+        android:layout_below="@+id/imgTransformerAmount"
+        android:contentDescription="@string/authcode"
+        android:src="@drawable/abc_ab_share_pack_holo_light" />
+
+    <ImageView
+        android:id="@+id/imgDstAccount"
+        android:layout_width="192dp"
+        android:layout_height="24dp"
+        android:layout_alignLeft="@+id/imgSrcAccount"
+        android:layout_below="@+id/imgSrcAccount"
+        android:contentDescription="@string/dstAccount"
+        android:src="@drawable/abc_ab_share_pack_holo_light" />
+
+    <Button
+        android:id="@+id/btnVerifyData"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/etTransformerAmount"
+        android:layout_marginTop="14dp"
+        android:layout_toLeftOf="@+id/etTransformerAmount"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/VerifyData"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignBaseline="@+id/btnVerifyData"
+        android:layout_alignBottom="@+id/btnVerifyData"
+        android:layout_alignRight="@+id/imgSrcAccount"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/confirm"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/btnBanlance"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/imgAuthCode"
+        android:layout_marginTop="15dp"
+        android:layout_toLeftOf="@+id/etTransformerAmount"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/BanlanceCash"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tvBanlance"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignBaseline="@+id/btnBanlance"
+        android:layout_alignBottom="@+id/btnBanlance"
+        android:layout_alignRight="@+id/etTransformerAmount"
+        android:background="@color/White"
+        android:gravity="center"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="20sp" />
+
+</RelativeLayout>
