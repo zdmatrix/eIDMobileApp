@@ -11,7 +11,7 @@
         android:layout_width="100dp"
         android:layout_height="48dp"
         android:layout_above="@+id/btnBanlance"
-        android:layout_alignLeft="@+id/editTextRecharge"
+        android:layout_alignLeft="@+id/etRecharge"
         android:ems="10"
         android:inputType="numberDecimal" />
 
@@ -35,13 +35,13 @@
         android:layout_height="40dp"
         android:layout_below="@+id/btnLogIn"
         android:layout_marginTop="40dp"
-        android:layout_toLeftOf="@+id/editTextRecharge"
+        android:layout_toLeftOf="@+id/etRecharge"
         android:background="@drawable/rectangle_button"
         android:text="@string/BanlanceCash"
         android:textSize="15sp" />
 
     <EditText
-        android:id="@+id/editTextRecharge"
+        android:id="@+id/etRecharge"
         android:layout_width="100dp"
         android:layout_height="48dp"
         android:layout_alignBaseline="@+id/btnRecharge"
@@ -59,9 +59,9 @@
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:layout_alignLeft="@+id/btnRecharge"
-        android:layout_below="@+id/editTextRecharge"
+        android:layout_below="@+id/etRecharge"
         android:layout_marginTop="40dp"
-        android:layout_toLeftOf="@+id/editTextRecharge"
+        android:layout_toLeftOf="@+id/etRecharge"
         android:background="@drawable/rectangle_button"
         android:text="@string/Consume"
         android:textSize="15sp" />

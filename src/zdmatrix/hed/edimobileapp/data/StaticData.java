@@ -46,6 +46,7 @@ public class StaticData {
 	};
 	
 	public static final String sSWOK = "9000";
+	public static final String sSWWAIT = "6000";
 	public static final String sSWERROR = " 非法SW";
 	public static final String sFETCHNEXTDATA = "61";
 	
@@ -53,20 +54,29 @@ public class StaticData {
 	public static final String sGETAUTHCODEERR = " 取认证码失败";
 	public static final String sSELECTFILEERR = " 选文件失败";
 	
-	
+	public static final String sTRADEDATANULL = " 请输入交易金额！";
+	public static final String sTRADEDONE = "交易成功";
 	public static final String sOVERBANLANCE = " 消费金额超出余额！";
 	public static final String sOVERECASHLIMIT = "充值金额过大，余额请勿超过1000！";
 	public static final String sUPBINDATAERR = " 更新余额失败！";
 	public static final String sREADBANLANCEERR = " 读余额失败";
+	public static final String sOUTOFTIME = " 操作超时";
+	public static final String sWRITEFIRSTLINEERR = " 第一行数据写失败";
+	public static final String sWRITESECONDLINEERR = " 第二行数据写失败";
+	public static final String sDISPLAYERR = " 显示数据失败";
 	
 	public static final String sUNKNOWERR = " Unknow Error!";
 	public static final String sCONNECTFAILED = " Connect Tag Failed!";
 	public static final String sNONFCINTENT = " Not Detected NFC Intent!";
 	public static final String sOPENNFC = " Please Open NFC in Setting First!";
 	public static final String sNOTSUPPORTNFC = " Not Support NFC!";
+//	public static final String sCONFIRMRECHARGE = "确认充值";
 	
 	public static final String sWRITEAPDU = "80bf0100";
-	public static final byte[] bWRITEAPDU = {(byte)0x80, (byte)0xbf, 0x01, 0x00, 0x00};
+	public static final byte[] bWRITELINEAPDU = {(byte)0x80, (byte)0xbf, 0x01, 0x00, 0x00};				//bWRITELINEAPDU[3] = 0x01,means first line
+																										//bWRITELINEAPDU[3] = 0x02,means second line
+	public static final byte[] bDISPLAYONCARD = {(byte)0x80, (byte)0xBF, 0x01, 0x03, 0x00};
+	//	public static final byte[] bWRITESECONDLINEAPDU = {(byte)0x80, (byte)0xbf, 0x02, 0x00, 0x00};
 	public static final byte[] bGETRANDOMDATA = {0x00, (byte)0x84, 0x00, 0x00, 0x08};
 	public static final byte[] bFETCHNEXTDATA = {0x00, (byte)0xc0, 0x00, 0x00, 0x00};
 	public static final byte[] bGENERATEUTHCODE = {(byte)0x80, (byte)0xbf, 0x08, 0x00, 0x00};
@@ -74,10 +84,11 @@ public class StaticData {
 	public static final byte[] bREADBINARAYDATA = {0x00, (byte)0xb0, 0x00, 0x00, 0x04};
 	public static final byte[] bSENDFIRSTLINEDATA = {(byte)0x80, (byte)0xBF, 0x01, 0x01, 0x00};
 	public static final byte[] bSENDSECONDLINEDATA = {(byte)0x80, (byte)0xBF, 0x01, 0x02, 0x00};
-	public static final byte[] bDISPLAYONCARD = {(byte)0x80, (byte)0xBF, 0x01, 0x03, 0x00};
+	
 	public static final byte[] bUPDATEBINARAYDATA = {0x00, (byte)0xd6, 0x00, 0x00, 0x04};
 	public static final byte[] bCARDINOTPMODE = {(byte)0x80, (byte)0xbf, 0x05, 0x00, 0x00};
 	public static final byte[] bFETCHAUTHCODE = {0x00, (byte)0xc0, 0x00, 0x00, 0x06};
 	public static final byte[] bBINARAYFILEID = {(byte)0x00, (byte)0x00};
+	public static final byte[] bWAITCARDBUTTONPUSHED = {(byte)0x80, (byte)0xbf, 0x06, 0x00, 0x00};
 	
 }

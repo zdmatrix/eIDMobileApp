@@ -11,16 +11,8 @@ import zdmatrix.hed.edimobileapp.data.StaticData;
 
 public class FunctionMoudle {
 	
-	public static byte[] GetDisData(int n){
-		String str = Integer.toString(n);
-		byte[] ch = str.getBytes();		
-		StaticData.bWRITEAPDU[4] = (byte)ch.length;
-		byte[] ret = new byte[ch.length + StaticData.nAPDULEN];
-		System.arraycopy(StaticData.bWRITEAPDU, 0, ret, 0, StaticData.nAPDULEN);
-		System.arraycopy(ch, 0, ret, StaticData.nAPDULEN, ch.length);
-		return ret;
-		
-	}
+	private static final byte FIRSTLINE = 0x01;
+	private static final byte SECONDLINE = 0x02;
 	
 	public static String[] ErrorProcess(int n){
 		String[] strRet = new String[2]; 
@@ -70,7 +62,7 @@ public class FunctionMoudle {
 						tmp = strResponse.substring(strResponse.length() - StaticData.nSWSTARTINDEX, strResponse.length() - StaticData.nSWENDINDEX);					
 					} while (tmp.substring(0, 1).equals(StaticData.sFETCHNEXTDATA));
 //					strRet[StaticData.nSW] = StaticData.sSWOK;
-				}else if(tmp.equals("9000")){
+				}else if(tmp.equals(StaticData.sSWOK)){
 					strRet[StaticData.nSW] = StaticData.sSWOK;
 					strRet[StaticData.nDATA] = str.substring(0, len - StaticData.nDATAENDINDEX);
 				}else{
@@ -78,7 +70,12 @@ public class FunctionMoudle {
 					strRet[StaticData.nDATA] = str.substring(0, len - StaticData.nDATAENDINDEX);
 				}
 			}else{
-				strRet[StaticData.nSW] = str;
+				if(str.equals(StaticData.sSWWAIT)){
+					strRet[StaticData.nSW] = StaticData.sOUTOFTIME;
+				}else{
+					strRet[StaticData.nSW] = str;
+				}	
+						
 			}			
 		}
 		return strRet;
@@ -95,71 +92,110 @@ public class FunctionMoudle {
 	public static String APDUCmd(byte[] apdu){
 		String strRet = "";
 		byte[] ret = NFCApplication.DataTransfer(apdu);
-		strRet = ReturnData(ret);
+		if(ret == null){
+			strRet = StaticData.sSWWAIT;
+		}else{
+			strRet = ReturnData(ret);
+		}
+		
 		return strRet;
 	}
 	
-	public static String[] BinDataRW(String input, int bindata, int processtype){
+	public static String[] readBanlance(){
 		String[] strRet = new String[2];
 		String response = "";
+		byte[] apduselect = new byte[7];
+		
+		System.arraycopy(StaticData.bSELECTFILE, 0, apduselect, 0, StaticData.nAPDULEN);
+		System.arraycopy(StaticData.bBINARAYFILEID, 0, apduselect, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
+		response = FunctionMoudle.APDUCmd(apduselect);
+		strRet = FunctionMoudle.APDUResponseProcess(response);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			response = FunctionMoudle.APDUCmd(StaticData.bREADBINARAYDATA);
+			strRet = FunctionMoudle.APDUResponseProcess(response);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += StaticData.sREADBANLANCEERR;					
+			}				
+		}else{
+			strRet[StaticData.nSW] += StaticData.sSELECTFILEERR;
+			
+		}							
+		return strRet;
+	}
+	
+	public static String[] upDateBinData(int n){
+		String response = "";
 		String tmp = "";
-		byte[] apdubanlance = new byte[7];
+		byte[] apduselect = new byte[7];
 		byte[] apdudatarw = new byte[9];
 		byte[] data = new byte[4];
-		
-		switch (processtype) {
-		case StaticData.nEXPENSE:
-			bindata = bindata - Integer.parseInt(input, 10);
-			if(bindata < 0){
-				strRet[StaticData.nSW] = StaticData.sOVERBANLANCE;
-			}else{
-				tmp = String.format("%1$08x", bindata);
-				data = string2ByteArray(tmp);
-				System.arraycopy(StaticData.bUPDATEBINARAYDATA, 0, apdudatarw, 0, StaticData.nAPDULEN);
-				System.arraycopy(data, 0, apdudatarw, StaticData.nAPDULEN, StaticData.nBINDATALEN);
-				response = APDUCmd(apdudatarw);
-				strRet = APDUResponseProcess(response);
-				if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-					strRet[StaticData.nSW] += StaticData.sUPBINDATAERR;
-				}					
-			}			
-			break;
-		case StaticData.nRECHARGE:				
-			bindata += Integer.parseInt(input, 10);
-			if(bindata > 1000){
-				strRet[StaticData.nSW] = StaticData.sOVERECASHLIMIT;
-			}else{
-				tmp = String.format("%1$08x", bindata);
-				data = string2ByteArray(tmp);
-				System.arraycopy(StaticData.bUPDATEBINARAYDATA, 0, apdudatarw, 0, StaticData.nAPDULEN);
-				System.arraycopy(data, 0, apdudatarw, StaticData.nAPDULEN, StaticData.nBINDATALEN);
-				response = APDUCmd(apdudatarw);
-				strRet = APDUResponseProcess(response);
-				if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-					strRet[StaticData.nSW] += StaticData.sUPBINDATAERR;
-				}
+		String[] strRet = new String[]{"", ""};
+		System.arraycopy(StaticData.bSELECTFILE, 0, apduselect, 0, StaticData.nAPDULEN);
+		System.arraycopy(StaticData.bBINARAYFILEID, 0, apduselect, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
+		response = FunctionMoudle.APDUCmd(apduselect);
+		strRet = FunctionMoudle.APDUResponseProcess(response);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			tmp = String.format("%1$08x", n);
+			data = string2ByteArray(tmp);
+			System.arraycopy(StaticData.bUPDATEBINARAYDATA, 0, apdudatarw, 0, StaticData.nAPDULEN);
+			System.arraycopy(data, 0, apdudatarw, StaticData.nAPDULEN, StaticData.nBINDATALEN);
+			response = APDUCmd(apdudatarw);
+			strRet = APDUResponseProcess(response);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += StaticData.sUPBINDATAERR;
 			}
-			break;
-		case StaticData.nREADBANLANCE:			
-			System.arraycopy(StaticData.bSELECTFILE, 0, apdubanlance, 0, StaticData.nAPDULEN);
-			System.arraycopy(StaticData.bBINARAYFILEID, 0, apdubanlance, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
-			response = FunctionMoudle.APDUCmd(apdubanlance);
-			strRet = FunctionMoudle.APDUResponseProcess(response);
+		}else{
+			strRet[StaticData.nSW] += StaticData.sSELECTFILEERR;
+		}
+		return strRet;
+	}
+	
+	public static String[] WaitCardButtonPushed(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		response = APDUCmd(StaticData.bWAITCARDBUTTONPUSHED);
+		strRet = APDUResponseProcess(response);
+		return strRet;
+	}
+	
+	public static String[] DisplayOnCard(int firstlinedata, int secondlinedata, boolean secondlineflag){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		if(secondlineflag){
+			byte[] apduline1 = getDisData(firstlinedata, FIRSTLINE);
+			response = APDUCmd(apduline1);
+			strRet = APDUResponseProcess(response);
 			if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-				response = FunctionMoudle.APDUCmd(StaticData.bREADBINARAYDATA);
-				strRet = FunctionMoudle.APDUResponseProcess(response);
+				byte[] apduline2 = getDisData(secondlinedata, SECONDLINE);
+				response = APDUCmd(apduline2);
+				strRet = APDUResponseProcess(response);
+				if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+					response = APDUCmd(StaticData.bDISPLAYONCARD);
+					strRet = APDUResponseProcess(response);
+					if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+						strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
+					}
+				}else{
+					strRet[StaticData.nSW] = StaticData.sWRITESECONDLINEERR;
+				}
+			}else{
+				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
+			}
+			
+		}else{
+			byte[] apduline1 = getDisData(firstlinedata, FIRSTLINE);
+			response = APDUCmd(apduline1);
+			strRet = APDUResponseProcess(response);
+			if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				response = APDUCmd(StaticData.bDISPLAYONCARD);
+				strRet = APDUResponseProcess(response);
 				if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-					strRet[StaticData.nSW] += StaticData.sREADBANLANCEERR;					
+					strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
 				}				
 			}else{
-				strRet[StaticData.nSW] += StaticData.sSELECTFILEERR;
-				
+				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
 			}
-			break;
-		default:
-			strRet[StaticData.nSW] += StaticData.sUNKNOWERR;
-			break;
-		}			
+		}		
 		return strRet;
 	}
 	
@@ -488,5 +524,16 @@ public class FunctionMoudle {
 	}
 	
 
+	public static byte[] getDisData(int n, int lineindex){
+		String str = Integer.toString(n);
+		byte[] ch = str.getBytes();	
+		StaticData.bWRITELINEAPDU[3] = (byte)lineindex;
+		StaticData.bWRITELINEAPDU[4] = (byte)ch.length;
+		byte[] ret = new byte[ch.length + StaticData.nAPDULEN];
+		System.arraycopy(StaticData.bWRITELINEAPDU, 0, ret, 0, StaticData.nAPDULEN);
+		System.arraycopy(ch, 0, ret, StaticData.nAPDULEN, ch.length);
+		return ret;
+		
+	}
 	
 }

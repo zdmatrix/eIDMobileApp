@@ -15,10 +15,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -60,6 +62,7 @@ public class NewKeyFragment extends Fragment{
 	String[] resault;
 	String strTransformer;
 	String strAuthCode;
+	String strRandom;
  	
 	@Override
 	public void onCreate(Bundle saveInstancStates){
@@ -146,6 +149,40 @@ public class NewKeyFragment extends Fragment{
 	public class VerifyDataThread extends Thread{
 		@Override
 		public void run(){
+			if(strTransformer == null){
+				resault[StaticData.nSW] = StaticData.sTRADEDATANULL;	
+				handler.post(runnableDisWarning);
+			}else{
+				if(!bGetBanlance){
+					resault = FunctionMoudle.readBanlance();
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						bGetBanlance = true;
+						nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
+					}else{
+						handler.post(runnableDisWarning);
+					}
+				}
+				if(bGetBanlance){
+					int n = nBanlance - Integer.parseInt(strTransformer, 10);
+					if(n < 0){
+						resault[StaticData.nSW] = StaticData.sOVERBANLANCE;
+						handler.post(runnableDisWarning);
+					}else{
+						String str = tvDstAccount.getHint().toString();
+//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(etTransformerAmount.getText().toString(), 10), Integer.parseInt(strTransformer, 10), true);
+						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(str, 10), Integer.parseInt(strTransformer, 10), true);
+							if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+    						nBanlance = n;
+    						handler.post(runnableVerifyData);
+        				}else{
+        					handler.post(runnableDisWarning);
+        				}
+						
+					}
+				}
+			}
+			
+			/*
 			String response = "";
 			response = FunctionMoudle.APDUCmd(StaticData.bGENERATEUTHCODE);
 			resault = FunctionMoudle.APDUResponseProcess(response);
@@ -162,12 +199,8 @@ public class NewKeyFragment extends Fragment{
 				resault[StaticData.nSW] += StaticData.sGENERATEAUTHCODEERR;
 				handler.post(runnableDisWarning);
 			}
-			bSrcAccount = FunctionMoudle.getImageData(tvSrcAccount.getHint().toString());
-			bDstAccount = FunctionMoudle.getImageData(tvDstAccount.getHint().toString());
-			bAuthCode = FunctionMoudle.getImageData(strAuthCode);
-			bTransformerAmount = FunctionMoudle.getImageData(strTransformer);
+			*/
 			
-			handler.post(runnableDisImg);
 		}
 	}
 	
@@ -181,11 +214,12 @@ public class NewKeyFragment extends Fragment{
 	public class GetBanlanceThread extends Thread{
 		@Override
 		public void run(){
-			resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+			resault = FunctionMoudle.readBanlance();
 			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
 				handler.post(runnableDisWarning);
 				bGetBanlance = false;
 			}else{
+				nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
 				handler.post(runnableDisBanlance);
 				bGetBanlance = true;
 			}
@@ -213,7 +247,7 @@ public class NewKeyFragment extends Fragment{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			tvBanlance.setText(String.format("%1$s", Integer.parseInt(resault[StaticData.nDATA], 16)));
+			tvBanlance.setText(String.format("%1$s", nBanlance));
 		}
 	};
 	
@@ -236,6 +270,104 @@ public class NewKeyFragment extends Fragment{
                 }
             })
             .create();//创建            
+            dlg.show();//显示
+		}
+	};
+	
+	Runnable runnableVerifyData = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("确认交易" + strTransformer + "?\r\n请核对卡上显示的交易额度和目的帐号\r\n确认请按卡上按钮确认")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		new Thread(){
+            			public void run(){
+            				resault = FunctionMoudle.WaitCardButtonPushed();
+            				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            					byte[] r = new byte[6];
+//            					random.nextBytes(r);
+            					strRandom = "";
+            					for(int i = 0; i < r.length; i ++){
+            						r[i] = (byte)(Math.random() * 10);
+            						strRandom += String.format("%1$1d", (byte)r[i]);
+            					}
+            					
+            					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strTransformer, 10), true);
+            					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            						bSrcAccount = FunctionMoudle.getImageData(tvSrcAccount.getHint().toString());
+            						bDstAccount = FunctionMoudle.getImageData(tvDstAccount.getHint().toString());
+            						bAuthCode = FunctionMoudle.getImageData(strAuthCode);
+            						bTransformerAmount = FunctionMoudle.getImageData(strTransformer);            						
+            						handler.post(runnableDisImg);
+            						handler.post(runnableConfirmTransfor);
+                				}	
+            					
+            				}
+            				handler.post(runnableDisWarning);            				                      	
+            			}
+            		}.start();
+                }
+            })
+
+            .setNegativeButton("取消",
+            new DialogInterface.OnClickListener(){
+            	public void onClick(DialogInterface dialog, int whichButton){
+            		;
+            	}
+            }
+            )
+            .create();//创建   
+			Window window = dlg.getWindow();
+			window.setGravity(Gravity.BOTTOM);
+            dlg.show();//显示
+		}
+	};
+	
+	Runnable runnableConfirmTransfor = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("确认交易" + strTransformer + "?\r\n请核对卡上显示的目的帐号和认证码与手机上图片显示一致\r\n确认交易请按卡上按钮确认")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		new Thread(){
+            			public void run(){
+            				resault = FunctionMoudle.WaitCardButtonPushed();
+            				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            					resault[StaticData.nSW] = StaticData.sTRADEDONE;
+            					
+            				}
+            				handler.post(runnableDisWarning);            				                      	
+            			}
+            		}.start();
+                }
+            })
+
+            .setNegativeButton("取消",
+            new DialogInterface.OnClickListener(){
+            	public void onClick(DialogInterface dialog, int whichButton){
+            		;
+            	}
+            }
+            )
+            .create();//创建   
+			Window window = dlg.getWindow();
+			window.setGravity(Gravity.TOP);
             dlg.show();//显示
 		}
 	};

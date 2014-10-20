@@ -5,17 +5,17 @@ import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.edimobileapp.data.StaticData;
 import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
-import android.R.integer;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -35,11 +35,14 @@ public class eCashFragment extends Fragment{
 	String strRechargeData;
 	String strExpenseData;
 	String strBanlance;
+	String strTradeData;
 	String[] resault;
 	
 	int nBanlance;
 	int nRet;
 	boolean bGetBanlance;
+	boolean bConfirmRecharg;
+	boolean bConfirmConsume;
 	
 	Handler handler;
 
@@ -65,7 +68,7 @@ public class eCashFragment extends Fragment{
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);
 		btnReturn.setOnClickListener(new ClickEvent());
 		
-		editTextRecharge = (EditText)view.findViewById(R.id.editTextRecharge);
+		editTextRecharge = (EditText)view.findViewById(R.id.etRecharge);
 		editTextRecharge.setOnKeyListener(new EditText.OnKeyListener(){
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -90,9 +93,11 @@ public class eCashFragment extends Fragment{
 		
 		handler = new Handler();
 		
-		resault = new String[2];
+		resault = new String[]{"", ""};
 		nBanlance = 0;
 		bGetBanlance = false;
+		bConfirmRecharg = false;
+		bConfirmConsume = false;
 		
 		nRet = NFCApplication.isSupportNFC(getActivity());
 		if(nRet != NFCMsgCode.nSUPPORT_NFC){
@@ -132,13 +137,16 @@ public class eCashFragment extends Fragment{
 	public class GetBanlanceThread extends Thread{
 		@Override
 		public void run(){
-			resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+			resault = FunctionMoudle.readBanlance();
 			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
-				handler.post(runnableDisWarning);
+				nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
 				bGetBanlance = false;
+				handler.post(runnableDisWarning);
+				
 			}else{
-				handler.post(runnableDisBanlance);
 				bGetBanlance = true;
+				handler.post(runnableDisBanlance);
+				
 			}
 		}
 	}
@@ -147,21 +155,38 @@ public class eCashFragment extends Fragment{
 		@Override
 		public void run(){
 			if(strRechargeData == null){
-				resault[StaticData.nSW] = "请输入充值金额";					
+				resault[StaticData.nSW] = StaticData.sTRADEDATANULL;	
+				handler.post(runnableDisWarning);
 			}else{
 				if(!bGetBanlance){
-					resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+					resault = FunctionMoudle.readBanlance();
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						bGetBanlance = true;
 						nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
-						resault = FunctionMoudle.BinDataRW(strRechargeData, nBanlance, StaticData.nRECHARGE);
+					}else{
+						handler.post(runnableDisWarning);
 					}
-				}else{
-					resault = FunctionMoudle.BinDataRW(strRechargeData, nBanlance, StaticData.nRECHARGE);
+				}
+				if(bGetBanlance){
+					int n = 0;					
+					n = nBanlance + Integer.parseInt(strRechargeData, 10);
+					if(n > 1000){
+						resault[StaticData.nSW] = StaticData.sOVERECASHLIMIT;
+						handler.post(runnableDisWarning);
+					}else{
+						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRechargeData, 10), 0, false);
+    					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+    						nBanlance = n;
+    						strTradeData = strRechargeData;
+    						handler.post(runnableUpdateBinData);
+        				}else{
+        					handler.post(runnableDisWarning);
+        				}
+						
+					}
 				}
 			}
-			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
-				handler.post(runnableDisWarning);
-			}			
+		
 		}
 	}
 	
@@ -169,21 +194,37 @@ public class eCashFragment extends Fragment{
 		@Override
 		public void run(){
 			if(strExpenseData == null){
-				resault[StaticData.nSW] = "请输入消费金额";
-				
+				resault[StaticData.nSW] = StaticData.sTRADEDATANULL;	
+				handler.post(runnableDisWarning);
 			}else{
 				if(!bGetBanlance){
-					resault = FunctionMoudle.BinDataRW(null, 0, StaticData.nREADBANLANCE);
+					resault = FunctionMoudle.readBanlance();
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						bGetBanlance = true;
 						nBanlance = Integer.parseInt(resault[StaticData.nDATA], 16);
-						resault = FunctionMoudle.BinDataRW(strExpenseData, nBanlance, StaticData.nEXPENSE);
+					}else{
+						handler.post(runnableDisWarning);
 					}
-				}else{
-					resault = FunctionMoudle.BinDataRW(strExpenseData, nBanlance, StaticData.nEXPENSE);
 				}
-			}
-			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
-				handler.post(runnableDisWarning);
+				if(bGetBanlance){
+					int n = 0;
+					
+					n = nBanlance - Integer.parseInt(strExpenseData, 10);
+					if(n < 0){
+						resault[StaticData.nSW] = StaticData.sOVERBANLANCE;
+						handler.post(runnableDisWarning);
+					}else{
+						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strExpenseData, 10), 0, false);
+    					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+    						nBanlance = n;
+    						strTradeData = strExpenseData;
+    						handler.post(runnableUpdateBinData);
+        				}else{
+        					handler.post(runnableDisWarning);
+        				}
+						
+					}
+				}
 			}
 			
 			
@@ -195,7 +236,7 @@ public class eCashFragment extends Fragment{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			tvBanlance.setText(String.format("%1$s", Integer.parseInt(resault[StaticData.nDATA], 16)));
+			tvBanlance.setText(String.format("%1$s", nBanlance));
 		}
 	};
 	
@@ -217,8 +258,60 @@ public class eCashFragment extends Fragment{
                 	;
                 }
             })
+
             .create();//创建            
             dlg.show();//显示
+		}
+	};
+	
+	Runnable runnableUpdateBinData = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("确认充值" + strTradeData + "?\r\n请核对卡上显示的交易额度\r\n确认交易请按卡上按钮确认")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		new Thread(){
+            			public void run(){
+            				resault = FunctionMoudle.WaitCardButtonPushed();
+            				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){ 
+            					resault = FunctionMoudle.upDateBinData(nBanlance);
+                				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+                					try {
+										sleep(800);
+									} catch (Exception e) {
+										// TODO: handle exception
+										e.printStackTrace();
+									}
+                					resault[StaticData.nSW] = StaticData.sTRADEDONE;
+                				}	
+            				}
+            				handler.post(runnableDisWarning);            				                      	
+            			}
+            		}.start();
+                }
+            })
+            
+            .setNegativeButton("取消",
+            new DialogInterface.OnClickListener(){
+            	public void onClick(DialogInterface dialog, int whichButton){
+            		;
+            	}
+            }
+            )
+
+            .create();//创建    
+			
+            dlg.show();//显示
+            
+            
 		}
 	};
 	

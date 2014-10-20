@@ -102,7 +102,7 @@ public class TestFragment extends Fragment{
 		public void run(){
 			String strRet = FunctionMoudle.APDUCmd(StaticData.bGETRANDOMDATA);
 			resault = FunctionMoudle.APDUResponseProcess(strRet);
-			if(resault[StaticData.nSW].equals("0x9000")){
+			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "¶Á¿¨³É¹¦£¡";
 			}else{
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "¶Á¿¨Ê§°Ü£¡";					
@@ -114,14 +114,14 @@ public class TestFragment extends Fragment{
 	public class WriteThread extends Thread{
 		@Override
 		public void run(){
-			byte[] apdu = FunctionMoudle.GetDisData(nClickCount % 100);
-			String strRet = FunctionMoudle.APDUCmd(apdu);
-			resault = FunctionMoudle.APDUResponseProcess(strRet);
-			if(resault[StaticData.nSW].equals("0x9000")){
+			resault = FunctionMoudle.DisplayOnCard(nClickCount % 100, 0, false);
+			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "Ð´¿¨³É¹¦£¡";
+				resault[StaticData.nDATA] = null;
 			}else{
+				resault[StaticData.nDATA] = resault[StaticData.nSW];
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "Ð´¿¨Ê§°Ü£¡";					
-			}						
+			}
 			handler.post(runnableDisResault);
 		}
 		
