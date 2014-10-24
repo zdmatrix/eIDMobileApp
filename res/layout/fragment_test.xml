@@ -7,7 +7,7 @@
     android:orientation="vertical" >
 
     <Button
-        android:id="@+id/btnLogIn"
+        android:id="@+id/btnExpense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/btnRecharge"
@@ -34,7 +34,7 @@
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/TextView02"
+        android:id="@+id/tvResponseCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/tveCashResault"
@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/btnLogIn"
+        android:layout_below="@+id/btnExpense"
         android:layout_marginRight="10dp"
         android:layout_marginTop="35dp"
         android:background="@color/White"
@@ -72,7 +72,7 @@
         android:textSize="@dimen/abc_action_bar_title_text_size" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/tveCashShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -87,7 +87,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/btnReturn"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/tveCashShow"
         android:layout_marginTop="35dp"
         android:background="@drawable/ellipse_button"
         android:text="@string/Read" />

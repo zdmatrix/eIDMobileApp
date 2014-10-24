@@ -2,10 +2,8 @@ package zdmatrix.hed.eidmobileapp.fragment;
 
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
-import zdmatrix.hed.edimobileapp.data.StaticData;
 import zdmatrix.hed.eid.eidmobileapp.R;
-import zdmatrix.hed.eidmobileapp.fragment.eCashFragment.ExpenseThread;
-import zdmatrix.hed.eidmobileapp.fragment.eCashFragment.RechargeThread;
+import zdmatrix.hed.eidmobileapp.data.StaticData;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,7 +27,6 @@ public class NewKeyFragment extends Fragment{
 	
 	Button btnReturn;
 	Button btnVerifyData;
-	Button btnOk;
 	Button btnBanlance;
 	
 	ImageView imgSrcAccount;
@@ -63,6 +59,7 @@ public class NewKeyFragment extends Fragment{
 	String strTransformer;
 	String strAuthCode;
 	String strRandom;
+	String strDisDstAccount;
  	
 	@Override
 	public void onCreate(Bundle saveInstancStates){
@@ -79,8 +76,8 @@ public class NewKeyFragment extends Fragment{
 		btnVerifyData = (Button)view.findViewById(R.id.btnVerifyData);
 		btnVerifyData.setOnClickListener(new ClickEvent());
 		
-		btnOk = (Button)view.findViewById(R.id.btnOk);
-		btnOk.setOnClickListener(new ClickEvent());
+//		btnOk = (Button)view.findViewById(R.id.btnOk);
+//		btnOk.setOnClickListener(new ClickEvent());
 		
 		btnBanlance = (Button)view.findViewById(R.id.btnBanlance);
 		btnBanlance.setOnClickListener(new ClickEvent());
@@ -100,7 +97,7 @@ public class NewKeyFragment extends Fragment{
 				return false;
 			}			
 		});
-		tvDstAccount = (TextView)view.findViewById(R.id.tvDstAccount);
+		tvDstAccount = (TextView)view.findViewById(R.id.tvBeVerifyedData);
 		tvSrcAccount = (TextView)view.findViewById(R.id.tvSrcAccount);
 		tvBanlance = (TextView)view.findViewById(R.id.tvBanlance);
 		
@@ -131,9 +128,7 @@ public class NewKeyFragment extends Fragment{
 			}else{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
-					if(v == btnOk){
-						new ConfirmTransformThread().start();
-					}else if(v == btnBanlance){
+					if(v == btnBanlance){
 						new GetBanlanceThread().start();
 					}else if(v == btnVerifyData){
 						new VerifyDataThread().start();
@@ -153,6 +148,7 @@ public class NewKeyFragment extends Fragment{
 				resault[StaticData.nSW] = StaticData.sTRADEDATANULL;	
 				handler.post(runnableDisWarning);
 			}else{
+				handler.post(runnableDisableOtherButton);
 				if(!bGetBanlance){
 					resault = FunctionMoudle.readBanlance();
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
@@ -168,9 +164,10 @@ public class NewKeyFragment extends Fragment{
 						resault[StaticData.nSW] = StaticData.sOVERBANLANCE;
 						handler.post(runnableDisWarning);
 					}else{
-						String str = tvDstAccount.getHint().toString();
+						strDisDstAccount = tvDstAccount.getHint().toString().substring(StaticData.nSUBACCOUNTSTARTINDEX, StaticData.nSUBACCOUNTENDINDEX);
 //						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(etTransformerAmount.getText().toString(), 10), Integer.parseInt(strTransformer, 10), true);
-						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(str, 10), Integer.parseInt(strTransformer, 10), true);
+						
+						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTransformer, 10), Integer.parseInt(strDisDstAccount, 10), true);
 							if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
     						nBanlance = n;
     						handler.post(runnableVerifyData);
@@ -180,36 +177,12 @@ public class NewKeyFragment extends Fragment{
 						
 					}
 				}
+				handler.post(runnableEnableOtherButton);
 			}
-			
-			/*
-			String response = "";
-			response = FunctionMoudle.APDUCmd(StaticData.bGENERATEUTHCODE);
-			resault = FunctionMoudle.APDUResponseProcess(response);
-			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-				response = FunctionMoudle.APDUCmd(StaticData.bFETCHAUTHCODE);
-				resault = FunctionMoudle.APDUResponseProcess(response);
-				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-					Log.i("PAUSE", "have a look");
-				}else{
-					resault[StaticData.nSW] += StaticData.sGETAUTHCODEERR;
-					handler.post(runnableDisWarning);
-				}
-			}else{
-				resault[StaticData.nSW] += StaticData.sGENERATEAUTHCODEERR;
-				handler.post(runnableDisWarning);
-			}
-			*/
 			
 		}
 	}
 	
-	public class ConfirmTransformThread extends Thread{
-		@Override
-		public void run(){
-			
-		}
-	}
 	
 	public class GetBanlanceThread extends Thread{
 		@Override
@@ -281,7 +254,7 @@ public class NewKeyFragment extends Fragment{
 			// TODO Auto-generated method stub
 			AlertDialog dlg = new AlertDialog.Builder(getActivity())
             .setTitle("提示信息")
-            .setMessage("确认交易" + strTransformer + "?\r\n请核对卡上显示的交易额度和目的帐号\r\n确认请按卡上按钮确认")
+            .setMessage("确认交易 " + strTransformer + " 元?\r\n请核对卡上显示的交易额度和目的帐号\r\n确认请按卡上按钮确认")
             .setView(null)//设置自定义对话框的样式
             .setPositiveButton("确定", //设置"确定"按钮
             new DialogInterface.OnClickListener() //设置事件监听
@@ -290,28 +263,33 @@ public class NewKeyFragment extends Fragment{
                 {
             		new Thread(){
             			public void run(){
+            				handler.post(runnableDisableOtherButton);
             				resault = FunctionMoudle.WaitCardButtonPushed();
             				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
             					byte[] r = new byte[6];
-//            					random.nextBytes(r);
             					strRandom = "";
             					for(int i = 0; i < r.length; i ++){
             						r[i] = (byte)(Math.random() * 10);
             						strRandom += String.format("%1$1d", (byte)r[i]);
             					}
             					
-            					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strTransformer, 10), true);
+//            					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strDisDstAccount, 10), Integer.parseInt(strRandom, 10), true);
+            					resault = FunctionMoudle.DisplayOnCard(nBanlance, Integer.parseInt(strRandom, 10), true);
             					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
             						bSrcAccount = FunctionMoudle.getImageData(tvSrcAccount.getHint().toString());
             						bDstAccount = FunctionMoudle.getImageData(tvDstAccount.getHint().toString());
-            						bAuthCode = FunctionMoudle.getImageData(strAuthCode);
+            						bAuthCode = FunctionMoudle.getImageData(strRandom);
             						bTransformerAmount = FunctionMoudle.getImageData(strTransformer);            						
             						handler.post(runnableDisImg);
             						handler.post(runnableConfirmTransfor);
+                				}else{
+                					handler.post(runnableDisWarning);  
                 				}	
             					
+            				}else{
+            					handler.post(runnableDisWarning);
             				}
-            				handler.post(runnableDisWarning);            				                      	
+            				handler.post(runnableEnableOtherButton);            				                      	
             			}
             		}.start();
                 }
@@ -338,7 +316,7 @@ public class NewKeyFragment extends Fragment{
 			// TODO Auto-generated method stub
 			AlertDialog dlg = new AlertDialog.Builder(getActivity())
             .setTitle("提示信息")
-            .setMessage("确认交易" + strTransformer + "?\r\n请核对卡上显示的目的帐号和认证码与手机上图片显示一致\r\n确认交易请按卡上按钮确认")
+            .setMessage("确认交易" + strTransformer + " 元?\r\n请核对卡上显示的认证码与手机上图片显示一致\r\n确认交易请按卡上按钮确认")
             .setView(null)//设置自定义对话框的样式
             .setPositiveButton("确定", //设置"确定"按钮
             new DialogInterface.OnClickListener() //设置事件监听
@@ -347,12 +325,21 @@ public class NewKeyFragment extends Fragment{
                 {
             		new Thread(){
             			public void run(){
+            				handler.post(runnableDisableOtherButton);
             				resault = FunctionMoudle.WaitCardButtonPushed();
             				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-            					resault[StaticData.nSW] = StaticData.sTRADEDONE;
+            					resault = FunctionMoudle.upDateBinData(nBanlance);
+            					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            						resault = FunctionMoudle.DisplayOnCard(StaticData.nSHOWNONEONCARD, 0, false);
+            						if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            							resault[StaticData.nSW] = StaticData.sTRADEDONE;
+            						}           						
+            					}
+            					
             					
             				}
-            				handler.post(runnableDisWarning);            				                      	
+            				handler.post(runnableDisWarning); 
+            				handler.post(runnableEnableOtherButton);
             			}
             		}.start();
                 }
@@ -370,5 +357,29 @@ public class NewKeyFragment extends Fragment{
 			window.setGravity(Gravity.TOP);
             dlg.show();//显示
 		}
+	};
+	
+	Runnable runnableDisableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnBanlance.setEnabled(false);
+			btnVerifyData.setEnabled(false);
+			btnReturn.setEnabled(false);
+		}
+
+	};
+	
+	Runnable runnableEnableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnBanlance.setEnabled(true);
+			btnVerifyData.setEnabled(true);
+			btnReturn.setEnabled(true);
+		}
+
 	};
 }

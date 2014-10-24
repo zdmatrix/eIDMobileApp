@@ -1,30 +1,25 @@
 package zdmatrix.hed.eidmobileapp.fragment;
 
-import java.security.PublicKey;
-import java.util.Currency;
+
 import java.util.Random;
 
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 
 import zdmatrix.hed.eid.eidmobileapp.R;
-import zdmatrix.hed.eidmobileapp.fragment.TestFragment.GetRandomThread;
-import zdmatrix.hed.eidmobileapp.fragment.TestFragment.WriteThread;
+import zdmatrix.hed.eidmobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.pm.PackageParser.NewPermissionInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
-import android.text.format.Time;
-import android.view.KeyEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class OTPFragment extends Fragment{
@@ -34,16 +29,16 @@ public class OTPFragment extends Fragment{
 	Button btnLogIn;
 	
 	TextView tvChallengeCode;
-	EditText etResponseCode;
+	TextView tvResponseCode;
 	
 	Handler handler;
 	
 	Random random;
 	
 	String strResponseCode;
-	String resault;
-	String data;
+	String[] resault;
 	String strRandom;
+	byte[] bRandom;
 	
 	int nRet;
 	
@@ -62,24 +57,17 @@ public class OTPFragment extends Fragment{
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);
 		btnReturn.setOnClickListener(new ClickEvent());
 		
-		btnLogIn = (Button)view.findViewById(R.id.btnLogIn);
+		btnLogIn = (Button)view.findViewById(R.id.btnExpense);
 		btnLogIn.setOnClickListener(new ClickEvent());
 		
 		tvChallengeCode = (TextView)view.findViewById(R.id.tvChallengeCode);
 		
 		handler = new Handler();
 		
-		etResponseCode = (EditText)view.findViewById(R.id.etResponseCode);
-		etResponseCode.setOnKeyListener(new EditText.OnKeyListener(){
-
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				// TODO Auto-generated method stub
-				strResponseCode = etResponseCode.getText().toString();
-				return false;
-			}
-			
-		});
+		tvResponseCode = (TextView)view.findViewById(R.id.tvResponseCode);
+		
+		resault = new String[]{"", ""};
+		bRandom = new byte[6];
 		
 		return view;
 	}
@@ -91,28 +79,17 @@ public class OTPFragment extends Fragment{
 				MainFragment mainFragment = new MainFragment();
 				getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, mainFragment).commit();
 			}else{
-				nRet = NFCApplication.isSupportNFC(getActivity());
-				switch (nRet) {
-				case NFCMsgCode.nNOT_SUPPORT_NFC:
-					data = null;
-					resault = "Not Support NFC!";
-					handler.post(runnableDisResault);
-					break;
-				case NFCMsgCode.nNOT_OPEN_NFC:
-//					msg = "#" + String.format("%1$03d", nClickCount) + "  ";
-					data = null;
-					resault = "Please Open NFC in Setting First!";
-					handler.post(runnableDisResault);
-					break;
-				case NFCMsgCode.nSUPPORT_NFC:
+				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
+				if(nRet == NFCMsgCode.nTAG_CONNECT){
 					if(v == btnChallengeCode){
 						new GenerateChallengeCodeThread().start();
 					}else if(v == btnLogIn){
 						new LogInThread().start();
 					}
-					break;
-				default:
-					break;
+					
+				}else{
+					resault = FunctionMoudle.ErrorProcess(nRet);
+					handler.post(runnableDisWarning);
 				}
 				
 			}
@@ -122,16 +99,14 @@ public class OTPFragment extends Fragment{
 	public class GenerateChallengeCodeThread extends Thread{
 		@Override
 		public void run(){
-//			Time time = new Time();
-//			random = new Random(time.toMillis(false));
-			byte[] r = new byte[6];
-//			random.nextBytes(r);
+			handler.post(runnableDisableOtherButton);
 			strRandom = "";
-			for(int i = 0; i < r.length; i ++){
-				r[i] = (byte)(Math.random() * 10);
-				strRandom += String.format("%1$1d", (byte)r[i]);
+			for(int i = 0; i < bRandom.length; i ++){
+				bRandom[i] = (byte)(Math.random() * 10);
+				strRandom += String.format("%1$1d", (byte)bRandom[i]);
 			}
 			handler.post(runnableDisRandom);
+			handler.post(runnableEnableOtherButton);
 			
 		}
 	}
@@ -139,17 +114,33 @@ public class OTPFragment extends Fragment{
 	public class LogInThread extends Thread{
 		@Override
 		public void run(){
-			
+			handler.post(runnableLogIn);
 		}
 	}
 	
-	Runnable runnableDisResault = new Runnable(){
+	
+	Runnable runnableDisRandom = new Runnable(){
 		@Override
 		public void run(){
-			final ProgressDialog m_Dialog;
+			tvChallengeCode.setText(strRandom);
+			resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), 0, false);
+			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+				handler.post(runnableGenerateResponseCode);
+			}else {
+				handler.post(runnableDisWarning);
+			}
+		}
+	};
+	
+	Runnable runnableDisWarning = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+//			tveCashResault.setText(resault);
 			AlertDialog dlg = new AlertDialog.Builder(getActivity())
             .setTitle("提示信息")
-            .setMessage(resault)       
+            .setMessage(resault[StaticData.nSW])       
             .setView(null)//设置自定义对话框的样式
             .setPositiveButton("确定", //设置"确定"按钮
             new DialogInterface.OnClickListener() //设置事件监听
@@ -159,15 +150,160 @@ public class OTPFragment extends Fragment{
                 	;
                 }
             })
+
             .create();//创建            
             dlg.show();//显示
 		}
 	};
 	
-	Runnable runnableDisRandom = new Runnable(){
+	Runnable runnableGenerateResponseCode = new Runnable() {
+		
 		@Override
-		public void run(){
-			tvChallengeCode.setText(strRandom);
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("请核对卡上显示的挑战码和手机收到的挑战码是否一致\r\n确定后请按卡上按钮生成应答码")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		new Thread(){
+            			public void run(){
+            				handler.post(runnableDisableOtherButton);
+            				resault = FunctionMoudle.WaitCardButtonPushed();
+            				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            					strResponseCode = "";
+            					for(int i = 0; i < bRandom.length; i ++){
+            						bRandom[i] = (byte)(Math.random() * 10);
+            						strResponseCode += String.format("%1$1d", (byte)bRandom[i]);
+            					}
+            					int line1 = Integer.parseInt(strRandom, 10);
+            					int line2 = Integer.parseInt(strResponseCode, 10);
+            					resault = FunctionMoudle.DisplayOnCard(line1, line2, true);
+                				handler.post(runnableResponseCode);
+            					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+            						handler.post(runnableConfirm);
+                				}else{
+                					handler.post(runnableDisWarning);
+                				}	
+            				}else{
+            					handler.post(runnableDisWarning); 
+            				}
+            				handler.post(runnableEnableOtherButton);           				                      	
+            			}
+            		}.start();
+                }
+            })
+            
+            .setNegativeButton("取消",
+            new DialogInterface.OnClickListener(){
+            	public void onClick(DialogInterface dialog, int whichButton){
+            		;
+            	}
+            }
+            )
+
+            .create();//创建    
+			Window window = dlg.getWindow();
+			window.setGravity(Gravity.BOTTOM);
+            dlg.show();//显示
+            
+            
 		}
+	};
+	
+	Runnable runnableConfirm = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("请核对卡上显示的应答码和手机收到的应答码是否一致\r\n确定后请按手机上登录按钮登录")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		;
+                }
+            })
+            
+            .setNegativeButton("取消",
+            new DialogInterface.OnClickListener(){
+            	public void onClick(DialogInterface dialog, int whichButton){
+            		;
+            	}
+            }
+            )
+
+            .create();//创建    
+			Window window = dlg.getWindow();
+			window.setGravity(Gravity.BOTTOM);
+            dlg.show();//显示
+            
+            
+		}
+	};
+	
+	Runnable runnableLogIn = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			AlertDialog dlg = new AlertDialog.Builder(getActivity())
+            .setTitle("提示信息")
+            .setMessage("登录成功")
+            .setView(null)//设置自定义对话框的样式
+            .setPositiveButton("确定", //设置"确定"按钮
+            new DialogInterface.OnClickListener() //设置事件监听
+            {
+                public void onClick(DialogInterface dialog, int whichButton) 
+                {
+            		;
+                }
+            })            
+            .create();//创建    
+            dlg.show();//显示
+            
+            
+		}
+	};
+	
+	Runnable runnableResponseCode = new Runnable() {
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			tvResponseCode.setText(strResponseCode);
+		}
+	};
+	
+	Runnable runnableDisableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnChallengeCode.setEnabled(false);
+			btnLogIn.setEnabled(false);
+			btnReturn.setEnabled(false);
+		}
+
+	};
+	
+	Runnable runnableEnableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnChallengeCode.setEnabled(true);
+			btnLogIn.setEnabled(true);
+			btnReturn.setEnabled(true);
+		}
+
 	};
 }

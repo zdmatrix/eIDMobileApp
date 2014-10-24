@@ -1,8 +1,8 @@
 package zdmatrix.hed.eidmobileapp.fragment;
 
 
-import zdmatrix.hed.edimobileapp.data.StaticData;
 import zdmatrix.hed.eid.eidmobileapp.R;
+import zdmatrix.hed.eidmobileapp.data.StaticData;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import mafei.hed.nfcapplication.*;
 
 public class TestFragment extends Fragment{
@@ -30,12 +29,13 @@ public class TestFragment extends Fragment{
 //	String resault;
 //	String data;
 	String[] resault;
-	
+
 	Intent intent;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState); 
+
 	}
 	
 	@Override
@@ -46,7 +46,7 @@ public class TestFragment extends Fragment{
     	btnReturn = (Button)view.findViewById(R.id.btnReturn);
     	btnReturn.setOnClickListener(new ClickEvent());
     	
-    	btnWrite = (Button)view.findViewById(R.id.btnLogIn);
+    	btnWrite = (Button)view.findViewById(R.id.btnExpense);
     	btnWrite.setOnClickListener(new ClickEvent());
     	
     	btnGetRandom = (Button)view.findViewById(R.id.btnRecharge);
@@ -114,6 +114,7 @@ public class TestFragment extends Fragment{
 	public class WriteThread extends Thread{
 		@Override
 		public void run(){
+			handler.post(runnableDisableOtherButton);
 			resault = FunctionMoudle.DisplayOnCard(nClickCount % 100, 0, false);
 			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "Ð´¿¨³É¹¦£¡";
@@ -122,6 +123,7 @@ public class TestFragment extends Fragment{
 				resault[StaticData.nDATA] = resault[StaticData.nSW];
 				resault[StaticData.nSW] = "#" + String.format("%1$03d", nClickCount) + "Ð´¿¨Ê§°Ü£¡";					
 			}
+			handler.post(runnableEnableOtherButton);
 			handler.post(runnableDisResault);
 		}
 		
@@ -134,6 +136,30 @@ public class TestFragment extends Fragment{
 		// TODO Auto-generated method stub
 			tvTestResault.setText(resault[StaticData.nSW]);
 			tvTestDate.setText(resault[StaticData.nDATA]);
+		}
+
+	};
+	
+	Runnable runnableDisableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnGetRandom.setEnabled(false);
+			btnWrite.setEnabled(false);
+			btnReturn.setEnabled(false);
+		}
+
+	};
+	
+	Runnable runnableEnableOtherButton = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			btnGetRandom.setEnabled(true);
+			btnWrite.setEnabled(true);
+			btnReturn.setEnabled(true);
 		}
 
 	};

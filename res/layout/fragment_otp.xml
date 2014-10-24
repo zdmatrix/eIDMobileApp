@@ -6,20 +6,8 @@
     android:background="@color/LightSteelBlue"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/btnLogIn"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_alignLeft="@+id/btnReturn"
-        android:layout_alignRight="@+id/btnReturn"
-        android:layout_below="@+id/etResponseCode"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/Login"
-        android:textSize="15sp" />
-
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/tveCashShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -29,46 +17,15 @@
         android:text="@string/otp"
         android:textSize="@dimen/main_dimension" />
 
-    <Button
-        android:id="@+id/btnRecharge"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="21dp"
-        android:layout_toLeftOf="@+id/tvChallengeCode"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/GenerateChallenge"
-        android:textSize="15sp" />
-
-    <EditText
-        android:id="@+id/etResponseCode"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:layout_alignLeft="@+id/tvChallengeCode"
-        android:layout_below="@+id/tvChallengeCode"
-        android:layout_marginTop="18dp"
-        android:background="@color/White"
-        android:ems="10"
-        android:inputType="numberDecimal" />
-
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btnLogIn"
-        android:layout_alignLeft="@+id/btnRecharge"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/DynamicOrder"
-        android:textSize="24sp" />
-
     <TextView
         android:id="@+id/tvChallengeCode"
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:layout_alignBottom="@+id/btnRecharge"
-        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignLeft="@+id/tveCashShow"
         android:layout_marginLeft="19dp"
         android:background="@color/White"
+        android:gravity="center"
         android:isScrollContainer="true"
         android:lines="1"
         android:minEms="10"
@@ -84,6 +41,53 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/rectangle_button"
         android:text="@string/returnmain"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tvResponseCode"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignBottom="@+id/tvVerifyedData"
+        android:layout_alignLeft="@+id/tvChallengeCode"
+        android:background="@color/White"
+        android:gravity="center"
+        android:isScrollContainer="true"
+        android:lines="1"
+        android:minEms="10"
+        android:scrollbars="none"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btnExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_above="@+id/btnReturn"
+        android:layout_alignRight="@+id/tveCashShow"
+        android:layout_marginBottom="76dp"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/Login"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tvVerifyedData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnExpense"
+        android:layout_marginBottom="54dp"
+        android:layout_toLeftOf="@+id/tvChallengeCode"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/DynamicOrder"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btnRecharge"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_above="@+id/tvResponseCode"
+        android:layout_marginBottom="25dp"
+        android:layout_toLeftOf="@+id/tvChallengeCode"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/GenerateChallenge"
         android:textSize="15sp" />
 
 </RelativeLayout>

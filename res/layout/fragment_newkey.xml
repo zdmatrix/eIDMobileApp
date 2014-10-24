@@ -18,7 +18,7 @@
         android:textSize="15sp" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/tveCashShow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -29,10 +29,10 @@
         android:textSize="@dimen/main_dimension" />
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/tvVerifyedData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/tveCashShow"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:gravity="center_vertical|center_horizontal"
@@ -40,13 +40,13 @@
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/tvDstAccount"
+        android:id="@+id/tvBeVerifyedData"
         android:layout_width="130dp"
         android:layout_height="24dp"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/tveCashShow"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="8dp"
-        android:layout_toRightOf="@+id/TextView01"
+        android:layout_toRightOf="@+id/tvVerifyedData"
         android:background="@color/White"
         android:gravity="center"
         android:hint="@string/dstAccountNO"
@@ -60,9 +60,9 @@
         android:id="@+id/tvSrcAccount"
         android:layout_width="100dp"
         android:layout_height="24dp"
-        android:layout_alignLeft="@+id/tvDstAccount"
-        android:layout_alignRight="@+id/tvDstAccount"
-        android:layout_alignTop="@+id/TextView02"
+        android:layout_alignLeft="@+id/tvBeVerifyedData"
+        android:layout_alignRight="@+id/tvBeVerifyedData"
+        android:layout_alignTop="@+id/tvResponseCode"
         android:background="@color/White"
         android:gravity="center"
         android:hint="@string/srcAccountNO"
@@ -73,11 +73,11 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/TextView02"
+        android:id="@+id/tvResponseCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView01"
-        android:layout_below="@+id/tvDstAccount"
+        android:layout_alignLeft="@+id/tvVerifyedData"
+        android:layout_below="@+id/tvBeVerifyedData"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/SrcAccount"
@@ -104,10 +104,10 @@
         android:id="@+id/TextView04"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView02"
+        android:layout_alignLeft="@+id/tvResponseCode"
         android:layout_below="@+id/tvSrcAccount"
         android:layout_marginTop="8dp"
-        android:layout_toLeftOf="@+id/textView1"
+        android:layout_toLeftOf="@+id/tveCashShow"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/RechargeNum"
         android:textSize="18sp" />
@@ -158,7 +158,7 @@
         android:layout_width="192dp"
         android:layout_height="24dp"
         android:layout_above="@+id/TextView07"
-        android:layout_alignLeft="@+id/textView1"
+        android:layout_alignLeft="@+id/tveCashShow"
         android:contentDescription="@string/srcAccount"
         android:src="@drawable/abc_ab_share_pack_holo_light" />
 
@@ -190,28 +190,6 @@
         android:src="@drawable/abc_ab_share_pack_holo_light" />
 
     <Button
-        android:id="@+id/btnVerifyData"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:layout_below="@+id/etTransformerAmount"
-        android:layout_marginTop="14dp"
-        android:layout_toLeftOf="@+id/etTransformerAmount"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/VerifyData"
-        android:textSize="15sp" />
-
-    <Button
-        android:id="@+id/btnOk"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:layout_alignBaseline="@+id/btnVerifyData"
-        android:layout_alignBottom="@+id/btnVerifyData"
-        android:layout_alignRight="@+id/imgSrcAccount"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/confirm"
-        android:textSize="15sp" />
-
-    <Button
         android:id="@+id/btnBanlance"
         android:layout_width="100dp"
         android:layout_height="40dp"
@@ -236,5 +214,16 @@
         android:minEms="10"
         android:scrollbars="none"
         android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/btnVerifyData"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/btnReturn"
+        android:layout_below="@+id/etTransformerAmount"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/transform"
+        android:textSize="15sp" />
 
 </RelativeLayout>

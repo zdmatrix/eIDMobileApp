@@ -2,7 +2,6 @@ package zdmatrix.hed.eidmobileapp.fragment;
 
 
 import zdmatrix.hed.eid.eidmobileapp.R;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ public class MainFragment extends Fragment{
 	Button btnNewKey;
 	Button btneCash;
 	Button btnOTP;
+	Button btneID;
 	
 	
 	@Override
@@ -47,6 +47,9 @@ public class MainFragment extends Fragment{
         
         btnOTP = (Button)view.findViewById(R.id.btnOTP);
         btnOTP.setOnClickListener(new ClickEvent());
+        
+        btneID = (Button)view.findViewById(R.id.btneID);
+        btneID.setOnClickListener(new ClickEvent());
     	
     	return view;
     	
@@ -73,6 +76,10 @@ public class MainFragment extends Fragment{
     		if(v == btnNewKey){
     			NewKeyFragment newkeyfragment = new NewKeyFragment();
     			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, newkeyfragment).commit();
+    		}   		
+    		if(v == btneID){
+    			eIDFragment eIDfragment = new eIDFragment();
+    			getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, eIDfragment).commit();
     		}
     		
     	}

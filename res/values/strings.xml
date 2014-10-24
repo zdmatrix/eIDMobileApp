@@ -24,9 +24,9 @@
     <string name="ResetCard">卡上电复位</string>
     <string name="Powerdown">卡掉电</string>
     <string name="ElectricMoneyLable">本演示利用屏幕显示金额</string>
-    <string name="ElectricMoneyStep1">一. 输入充值金额（0--10000），点充值按钮，可在可视卡屏幕显示充值金额</string>
+    
     <string name="ElectricMoneyStep2">二. 按下可视卡上的按钮显余额</string>
-    <string name="ElectricMoneyStep3">三. 输入消费金额（0--10000），点消费按钮，可在可视卡屏幕显示消费金额</string>
+  
     <string name="ElectricMoneyStep4">四. 按下可视卡上的按钮显示余额</string>
     <string name="Recharge">充值</string>
     <string name="Consume">消费</string>
@@ -78,5 +78,10 @@
     <string name="dstAccount">目的账户</string>
     <string name="authcode">认证码</string>
     <string name="confirm">确认</string>
+    <string name="eID">eID应用</string>
+    <string name="eIDVerify">开始eID认证</string>
+    <string name="eidlabel1">待认证数据</string>
+    <string name="eidlabel2">认证数据</string>
+    <string name="transform">转账</string>
 
 </resources>

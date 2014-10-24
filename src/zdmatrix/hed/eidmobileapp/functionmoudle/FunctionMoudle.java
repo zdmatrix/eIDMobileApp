@@ -3,19 +3,19 @@ package zdmatrix.hed.eidmobileapp.functionmoudle;
 
 import java.util.Random;
 
-import android.R.integer;
-
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
-import zdmatrix.hed.edimobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.data.StaticData;
 
 public class FunctionMoudle {
 	
 	private static final byte FIRSTLINE = 0x01;
 	private static final byte SECONDLINE = 0x02;
+	private static final byte SELECTFILEAPDULEN = 0x07;
+	private static final byte UPDATEBINDATEAPDULEN = 0x09;
 	
 	public static String[] ErrorProcess(int n){
-		String[] strRet = new String[2]; 
+		String[] strRet = new String[StaticData.nRETURNSTRINGARRAYLEN]; 
 		switch (n) {
 		case NFCMsgCode.nNOT_SUPPORT_NFC:
 			strRet[StaticData.nDATA] = null;
@@ -42,7 +42,7 @@ public class FunctionMoudle {
 	
 	public static String[] APDUResponseProcess(String str){
 		
-		String[] strRet = new String[2]; 
+		String[] strRet = new String[StaticData.nRETURNSTRINGARRAYLEN]; 
 		String strResponse;
 		String tmp = "";
 		int len = str.length();
@@ -102,9 +102,9 @@ public class FunctionMoudle {
 	}
 	
 	public static String[] readBanlance(){
-		String[] strRet = new String[2];
+		String[] strRet = new String[StaticData.nRETURNSTRINGARRAYLEN];
 		String response = "";
-		byte[] apduselect = new byte[7];
+		byte[] apduselect = new byte[SELECTFILEAPDULEN];
 		
 		System.arraycopy(StaticData.bSELECTFILE, 0, apduselect, 0, StaticData.nAPDULEN);
 		System.arraycopy(StaticData.bBINARAYFILEID, 0, apduselect, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
@@ -126,8 +126,8 @@ public class FunctionMoudle {
 	public static String[] upDateBinData(int n){
 		String response = "";
 		String tmp = "";
-		byte[] apduselect = new byte[7];
-		byte[] apdudatarw = new byte[9];
+		byte[] apduselect = new byte[SELECTFILEAPDULEN];
+		byte[] apdudatarw = new byte[UPDATEBINDATEAPDULEN];
 		byte[] data = new byte[4];
 		String[] strRet = new String[]{"", ""};
 		System.arraycopy(StaticData.bSELECTFILE, 0, apduselect, 0, StaticData.nAPDULEN);
@@ -181,17 +181,27 @@ public class FunctionMoudle {
 			}else{
 				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
 			}
-			
 		}else{
-			byte[] apduline1 = getDisData(firstlinedata, FIRSTLINE);
-			response = APDUCmd(apduline1);
+			if(firstlinedata == StaticData.nSHOWNONEONCARD){
+				response = APDUCmd(StaticData.bSHOWNONEONFIRSTLINE);
+			}else{
+				byte[] apduline1 = getDisData(firstlinedata, FIRSTLINE);
+				response = APDUCmd(apduline1);
+			}
+			
 			strRet = APDUResponseProcess(response);
 			if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-				response = APDUCmd(StaticData.bDISPLAYONCARD);
+				response = APDUCmd(StaticData.bSHOWNONEONSECONDLINE);
 				strRet = APDUResponseProcess(response);
-				if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
-					strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
-				}				
+				if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+					response = APDUCmd(StaticData.bDISPLAYONCARD);
+					strRet = APDUResponseProcess(response);
+					if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+						strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
+					}
+				}else{
+					strRet[StaticData.nSW] += StaticData.sWRITESECONDLINEERR;
+				}								
 			}else{
 				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
 			}
@@ -199,9 +209,451 @@ public class FunctionMoudle {
 		return strRet;
 	}
 	
+	public static byte[] getData(String str, int lineindex){
+		byte[] ch = str.getBytes();	
+		StaticData.bWRITELINEAPDU[3] = (byte)lineindex;
+		StaticData.bWRITELINEAPDU[4] = (byte)ch.length;
+		byte[] ret = new byte[ch.length + StaticData.nAPDULEN];
+		System.arraycopy(StaticData.bWRITELINEAPDU, 0, ret, 0, StaticData.nAPDULEN);
+		System.arraycopy(ch, 0, ret, StaticData.nAPDULEN, ch.length);
+		return ret;
+		
+	}
+	
+	public static String[] Display(String firstlinedata, String secondlinedata, boolean secondlineflag){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		if(secondlineflag){
+			byte[] apduline1 = getData(firstlinedata, FIRSTLINE);
+			response = APDUCmd(apduline1);
+			strRet = APDUResponseProcess(response);
+			if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				byte[] apduline2 = getData(secondlinedata, SECONDLINE);
+				response = APDUCmd(apduline2);
+				strRet = APDUResponseProcess(response);
+				if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+					response = APDUCmd(StaticData.bDISPLAYONCARD);
+					strRet = APDUResponseProcess(response);
+					if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+						strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
+					}
+				}else{
+					strRet[StaticData.nSW] = StaticData.sWRITESECONDLINEERR;
+				}
+			}else{
+				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
+			}
+		}else{
+			if(firstlinedata.equals(StaticData.sSHOWNONEONCARD)){
+				response = APDUCmd(StaticData.bSHOWNONEONFIRSTLINE);
+			}else{
+				byte[] apduline1 = getData(firstlinedata, FIRSTLINE);
+				response = APDUCmd(apduline1);
+			}
+			
+			strRet = APDUResponseProcess(response);
+			if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				response = APDUCmd(StaticData.bSHOWNONEONSECONDLINE);
+				strRet = APDUResponseProcess(response);
+				if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+					response = APDUCmd(StaticData.bDISPLAYONCARD);
+					strRet = APDUResponseProcess(response);
+					if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+						strRet[StaticData.nSW] += StaticData.sDISPLAYERR;
+					}
+				}else{
+					strRet[StaticData.nSW] += StaticData.sWRITESECONDLINEERR;
+				}								
+			}else{
+				strRet[StaticData.nSW] = StaticData.sWRITEFIRSTLINEERR;
+			}
+		}		
+		return strRet;
+	}
+	
+	public static String[] eIDPersonalized(){
+			
+		String[] strRet = new String[]{"", ""};
+		
+		strRet = SelectEIDApplet();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = GenerateRSAKey();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+			
+		strRet = UpdateFileInfo(StaticData.bCONTAINERINDEXFILEID, StaticData.sUPDATECONTAINERINDEX);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bFILEINDEXFILEID, StaticData.sUPDATEFILEINDEX);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateContainerInfo();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bMAXCONTAINERFILEID, StaticData.sUPDATEMAXCONTAINERINFO);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = SelecteIDDir();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bLOADERINDEXFILEID, StaticData.sUPDATELOADERINDEXINFO);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateEIDMICXRSA2048();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bLOADERINDEXFILEID, StaticData.sUPDATELOADERINDEXINFO);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bPERSONINDEXFILEID, StaticData.sUPDATEPERSONINDEXINFO);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = UpdateFileInfo(StaticData.bLOADERCAPBILITY, StaticData.sUPDATELOADERCAPBILITYINFO);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = GetLoaderIndexInfo();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = SHA1Compress(StaticData.sSHA1COMPRESSFILEDATA);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = SHA1Compress(StaticData.sSHA1COMPRESSEXTERNANDFILEDATA);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = GenerateRSAKey();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = SHA1Compress(StaticData.sSHA1COMPRESSFILEDATA);
+		
+		return strRet;
+	}
+	
+	public static String[] eIDAuthen(){
+				
+		String[] strRet = new String[]{"", ""};
+		
+		strRet = InstallRSAKey();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = ExportPublicKey();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = VerifyCertData();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = RSAPrivateKeySign();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		
+		strRet = RSAPublicKeyAtuh();
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			return strRet;
+		}
+		return strRet;
+	}
+	
+	public static String[] InstallRSAKey(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		
+		byte[] apdu = string2ByteArray(StaticData.sINSTALLRSAKEYSTEP1);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Install RSA Key First Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sINSTALLRSAKEYSTEP2);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Install RSA Key Second Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sINSTALLRSAKEYSTEP3);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Install RSA Key Third Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sINSTALLRSAKEYSTEP4);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Install RSA Key Fourth Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sINSTALLRSAKEYSTEP5);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Install RSA Key Fifth Step Err!";
+		}
+		return strRet;
+	}
+	
+	public static String[] ExportPublicKey(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		
+		byte[] apdu = string2ByteArray(StaticData.sEXPORTPUBLICKEY1);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Export Public Key First Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sEXPORTPUBLICKEY2);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Export Public Key Second Step Err!";
+		}
+		
+		return strRet;
+	}
+	
+	public static String[] VerifyCertData(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		
+		byte[] apdu = string2ByteArray(StaticData.sVERIFYCERTDATA1);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Verify Cert Data First Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sVERIFYCERTDATA2);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Verify Cert Data Second Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sVERIFYCERTDATA3);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Verify Cert Data Third Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sVERIFYCERTDATA4);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Verify Cert Data Fourth Step Err!";
+			return strRet;
+		}
+		
+		apdu = string2ByteArray(StaticData.sVERIFYCERTDATA5);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " Verify Cert Data Fifth Step Err!";
+		}
+		return strRet;
+	}
+	
+	public static String[] RSAPrivateKeySign(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = string2ByteArray(StaticData.sRSAPRIVATEKEYSIGN);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += " RSA Private Key Sign Err";
+		}
+		return strRet;
+	}
+	
+	public static String[] RSAPublicKeyAtuh(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = string2ByteArray(StaticData.sRSAPUBLICEKEYAUTH);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += "RSA Public Key Sign Err";
+		}
+		return strRet;
+	}
+	
+	public static String[] SelectEIDApplet(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = string2ByteArray(StaticData.sGENERATERSAKEY);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += StaticData.sSELECTEIDAPPLETERR;
+		}
+		return strRet;
+	}
+	
+	public static String[] GenerateRSAKey(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		response = APDUCmd(StaticData.bSELECTEIDAPPLET);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += StaticData.sGENERATERSAKEYERR;
+		}
+		return strRet;
+	}
+	
+	public static String[] SelecteIDDir(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = new byte[SELECTFILEAPDULEN];
+		String fileidString = String.format("%1$#2X%2$2X", StaticData.bEIDDIR[0], StaticData.bEIDDIR[1]);
+				
+		System.arraycopy(StaticData.bSELECTFILE, 0, apdu, 0, StaticData.nAPDULEN);
+		System.arraycopy(StaticData.bEIDDIR, 0, apdu, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += StaticData.sSELECTFILEERR + fileidString;
+		}
+		return strRet;
+	}
+	
+	public static String[] GetLoaderIndexInfo(){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = new byte[SELECTFILEAPDULEN];
+		String fileidString = String.format("%1$#2X%2$2X", StaticData.bLOADERINDEXFILEID[0], StaticData.bLOADERINDEXFILEID[1]);
+				
+		System.arraycopy(StaticData.bSELECTFILE, 0, apdu, 0, StaticData.nAPDULEN);
+		System.arraycopy(StaticData.bLOADERINDEXFILEID, 0, apdu, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			byte[] apdu1 = string2ByteArray(StaticData.sREADLOADERINDEXINFO);
+			response = APDUCmd(apdu1);
+			strRet = APDUResponseProcess(response);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += StaticData.sREADFILEERR + fileidString;
+			}
+		}else{
+			strRet[StaticData.nSW] += StaticData.sSELECTFILEERR + fileidString;
+		}
+		return strRet;
+	}
+	
+	public static String[] SHA1Compress(String strapdu){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = string2ByteArray(strapdu);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet[StaticData.nSW] += StaticData.sSHA1COMPRESSERR;
+		}
+		return strRet;
+	}
+	
+	public static String[] UpdateFileInfo(byte[] fileid, String updateapdu){
+		String[] strRet = new String[]{"", ""};
+		String response = "";
+		byte[] apdu = new byte[SELECTFILEAPDULEN];
+		String fileidString = String.format("%1$#2X%2$2X", fileid[0], fileid[1]);
+				
+		System.arraycopy(StaticData.bSELECTFILE, 0, apdu, 0, StaticData.nAPDULEN);
+		System.arraycopy(fileid, 0, apdu, StaticData.nAPDULEN, StaticData.nFILEIDLEN);
+		response = APDUCmd(apdu);
+		strRet = APDUResponseProcess(response);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			byte[] apdu1 = string2ByteArray(updateapdu);
+			response = APDUCmd(apdu1);
+			strRet = APDUResponseProcess(response);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += StaticData.sUPDATEFILEERR + fileidString;
+			}
+		}else{
+			strRet[StaticData.nSW] += StaticData.sSELECTFILEERR + fileidString;
+		}
+		return strRet;
+	}
+	
+	public static String[] UpdateContainerInfo(){
+		String[] strRet = new String[]{"", ""};
+		strRet = UpdateFileInfo(StaticData.bCONTAINERINFOFILEID, StaticData.sUPDATECONTAINERINFO1);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet = UpdateFileInfo(StaticData.bCONTAINERINFOFILEID, StaticData.sUPDATECONTAINERINFO2);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += " 更新容器信息文件后120个数据失败";
+			}
+		}else{
+			strRet[StaticData.nSW] += " 更新容器信息文件前240个数据失败";
+		}
+		return strRet;
+	}
+	
+	public static String[] UpdateEIDMICXRSA2048(){
+		String[] strRet = new String[]{"", ""};
+		strRet = UpdateFileInfo(StaticData.bEIDMICXRSA2048FILEID, StaticData.sUPDATEEIDRSA2048INFO1);
+		if(strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+			strRet = UpdateFileInfo(StaticData.bCONTAINERINFOFILEID, StaticData.sUPDATEEIDRSA2048INFO2);
+			if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
+				strRet[StaticData.nSW] += " 更新eID MICX RSA2048文件后22个数据失败";
+			}
+		}else{
+			strRet[StaticData.nSW] += " 更新eID MICX RSA2048文件前240个数据失败";
+		}
+		return strRet;
+	}
+	
 	public static byte[] getImageData(String sdata){
 		int length = sdata.length();
-//		int ndata[] = DataTypeTrans.stringDecToIntArray(sdata);
 		int[] ndata = new int[length];
 		char[] ctmp = sdata.toCharArray();
 		for(int i = 0; i < length; i ++){
