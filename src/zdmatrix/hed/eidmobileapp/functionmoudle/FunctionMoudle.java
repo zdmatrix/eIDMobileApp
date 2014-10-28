@@ -368,12 +368,12 @@ public class FunctionMoudle {
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
-		
+/*		
 		strRet = ExportPublicKey();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
-		
+	*/	
 		strRet = VerifyCertData();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;

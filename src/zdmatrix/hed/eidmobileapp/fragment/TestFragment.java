@@ -49,7 +49,7 @@ public class TestFragment extends Fragment{
     	btnWrite = (Button)view.findViewById(R.id.btnExpense);
     	btnWrite.setOnClickListener(new ClickEvent());
     	
-    	btnGetRandom = (Button)view.findViewById(R.id.btnRecharge);
+    	btnGetRandom = (Button)view.findViewById(R.id.btneIDAuth);
     	btnGetRandom.setOnClickListener(new ClickEvent());
     	
     	tvTestDate = (TextView)view.findViewById(R.id.tvTestDate);

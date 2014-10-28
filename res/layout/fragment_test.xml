@@ -10,8 +10,8 @@
         android:id="@+id/btnExpense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnRecharge"
-        android:layout_below="@+id/btnRecharge"
+        android:layout_alignLeft="@+id/btneIDAuth"
+        android:layout_below="@+id/btneIDAuth"
         android:layout_marginTop="16dp"
         android:background="@drawable/ellipse_button"
         android:text="@string/Write" />
@@ -72,22 +72,22 @@
         android:textSize="@dimen/abc_action_bar_title_text_size" />
 
     <TextView
-        android:id="@+id/tveCashShow"
+        android:id="@+id/tveCash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/btnRecharge"
+        android:layout_alignRight="@+id/btneIDAuth"
         android:layout_marginTop="25dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/cardtest"
         android:textSize="@dimen/main_dimension" />
 
     <Button
-        android:id="@+id/btnRecharge"
+        android:id="@+id/btneIDAuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/btnReturn"
-        android:layout_below="@+id/tveCashShow"
+        android:layout_below="@+id/tveCash"
         android:layout_marginTop="35dp"
         android:background="@drawable/ellipse_button"
         android:text="@string/Read" />

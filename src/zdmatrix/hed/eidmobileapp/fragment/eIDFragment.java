@@ -6,13 +6,12 @@ import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 
-import android.R.integer;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
@@ -33,8 +32,8 @@ public class eIDFragment extends Fragment{
 	
 	TextView tvBeVerifyedData;
 	TextView tvVerifyedData;
-	TextView tvShow;
-	ScrollView scv;
+	TextView tveID;
+	ScrollView scveID;
 	
 	ImageView imgDisplay;
 	ImageView imgTitle;
@@ -61,14 +60,14 @@ public class eIDFragment extends Fragment{
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);
 		btnReturn.setOnClickListener(new ClickEvent());
 		
-		btneIDVerify = (Button)view.findViewById(R.id.btnRecharge);
+		btneIDVerify = (Button)view.findViewById(R.id.btneIDAuth);
 		btneIDVerify.setOnClickListener(new ClickEvent());
 		
-		scv = (ScrollView)view.findViewById(R.id.scveCash);
+		scveID = (ScrollView)view.findViewById(R.id.scveID);
 		tvBeVerifyedData = (TextView)view.findViewById(R.id.tvBeVerifyedData);
 		tvVerifyedData = (TextView)view.findViewById(R.id.tvVerifyedData);
-		tvShow = (TextView)view.findViewById(R.id.tveCashShow);
-		tvShow.setMovementMethod(ScrollingMovementMethod.getInstance());
+		tveID = (TextView)view.findViewById(R.id.tveID);
+		tveID.setMovementMethod(ScrollingMovementMethod.getInstance());
 		
 		imgDisplay = (ImageView)view.findViewById(R.id.imgDisplay);
 		Resources resources = view.getResources();
@@ -238,7 +237,7 @@ public class eIDFragment extends Fragment{
 				Show(" 卡个人化完成\r\n开始eID认证……\r\n");
 				resault = FunctionMoudle.eIDAuthen();
 				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-					Show(" eID认证成功！\r\n");
+//					Show(" eID认证成功！\r\n");
 					byte[] r = new byte[8];
 					strRetRandom = "";
 					for(int i = 0; i < r.length; i ++){
@@ -249,13 +248,11 @@ public class eIDFragment extends Fragment{
 
 					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
 					resault[StaticData.nSW] = " 认证成功!";
-															
+					Show(" eID认证成功！\r\n");										
 				}
-			}else{
-				Show(resault[StaticData.nSW]);
 			}
 		}
-		
+		handler.post(runnableDisWarning);
 		handler.post(runnableEnableOtherButton);
 	}
 	
@@ -273,7 +270,7 @@ public class eIDFragment extends Fragment{
 					Show("卡个人化完成\r\n开始eID认证……\r\n");
 					resault = FunctionMoudle.eIDAuthen();
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-						Show("eID认证成功！\r\n");
+						
 						byte[] r = new byte[8];
 						strRetRandom = "";
 						for(int i = 0; i < r.length; i ++){
@@ -284,9 +281,10 @@ public class eIDFragment extends Fragment{
 
 						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
 						resault[StaticData.nSW] = " 认证成功!";
-																
+//						Show("eID认证成功！\r\n");										
 					}
 				}
+				handler.post(runnableDisWarning);
 			}
 			
 			handler.post(runnableEnableOtherButton);
@@ -325,6 +323,7 @@ public class eIDFragment extends Fragment{
 		// TODO Auto-generated method stub
 			
 			tvBeVerifyedData.setText(strRandom);
+			tvVerifyedData.setText(null);
 			
 		}
 
@@ -344,73 +343,22 @@ public class eIDFragment extends Fragment{
 		
 		@Override
 		public void run() {
-			tvShow.setText(strShow);
-			scv.scrollTo(0, tvShow.getHeight());
+			tveID.setText(strShow);
+			
+//			scveID.scrollTo(0, offset);
+			scveID.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int offset = Math.abs(tveID.getMeasuredHeight() - scveID.getMeasuredHeight());
+					scveID.scrollTo(0, offset);
+				}
+			});
+			
 		}
 	};
 	
-	Runnable runnableVerifyThread = new Runnable() {
-		
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			AlertDialog dlg = new AlertDialog.Builder(getActivity())
-			.setTitle("提示信息")
-			.setMessage("确认手机上的待认证数据和卡上显示的数据一致\r\n确认后请按下卡上按钮进行认证")
-			.setPositiveButton("确定", 
-			new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					new Thread(){
-						public void run(){
-							handler.post(runnableDisableOtherButton);
-							resault = FunctionMoudle.WaitCardButtonPushed();
-							if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-								resault = FunctionMoudle.eIDPersonalized();
-								if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-									resault = FunctionMoudle.eIDAuthen();
-									if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-										byte[] r = new byte[8];
-										strRetRandom = "";
-										for(int i = 0; i < r.length; i ++){
-											r[i] = (byte)(Math.random() * 10);
-//											if(r[i] > 9){
-//												strDisData += "0";
-//											}else{
-//												strDisData += String.format("%1$1x", (byte)r[i]);
-//											}
-											strRetRandom += String.format("%1$1x", (byte)r[i]);
-										}
-										handler.post(runnableDisRetRandom);
-//										strRetRandom = strDisData;
-										resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
-										resault[StaticData.nSW] = " 认证成功!";
-																				
-									}
-								}
-							}
-							handler.post(runnableDisWarning);
-							handler.post(runnableEnableOtherButton);
-						}
-					}.start();
-				}
-			})
-			.setNegativeButton("取消",
-            new DialogInterface.OnClickListener(){
-            	public void onClick(DialogInterface dialog, int whichButton){
-            		;
-            	}
-            })
-            .create();
-			
-			Window window = dlg.getWindow();
-			window.setGravity(Gravity.BOTTOM);
-			
-            dlg.show();
-		}
-	};
 	
 	public void Show(String msg){
 		strShow += msg;

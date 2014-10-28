@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     android:background="@color/LightSteelBlue"
     android:orientation="vertical" >
-
+    
     <TextView
-        android:id="@+id/tveCashShow"
+        android:id="@+id/tvOTP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -16,13 +16,24 @@
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/otp"
         android:textSize="@dimen/main_dimension" />
+    
+    <Button
+        android:id="@+id/btnGenerateChalenge"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/tvOTP"
+        android:layout_marginTop="18dp"
+        android:layout_toLeftOf="@+id/tvChallengeCode"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/GenerateChallenge"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/tvChallengeCode"
         android:layout_width="100dp"
         android:layout_height="40dp"
-        android:layout_alignBottom="@+id/btnRecharge"
-        android:layout_alignLeft="@+id/tveCashShow"
+        android:layout_alignBottom="@id/btnGenerateChalenge"
+        android:layout_alignLeft="@id/tvOTP"
         android:layout_marginLeft="19dp"
         android:background="@color/White"
         android:gravity="center"
@@ -42,12 +53,23 @@
         android:background="@drawable/rectangle_button"
         android:text="@string/returnmain"
         android:textSize="15sp" />
-
+    
+    <TextView
+        android:id="@+id/tvResponseCodeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnGenerateChalenge"
+        android:layout_marginTop="30dp"
+        android:layout_toLeftOf="@+id/tvChallengeCode"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/DynamicOrder"
+        android:textSize="24sp" />
+    
     <TextView
         android:id="@+id/tvResponseCode"
         android:layout_width="100dp"
         android:layout_height="40dp"
-        android:layout_alignBottom="@+id/tvVerifyedData"
+        android:layout_alignBottom="@id/tvResponseCodeLabel"
         android:layout_alignLeft="@+id/tvChallengeCode"
         android:background="@color/White"
         android:gravity="center"
@@ -57,37 +79,41 @@
         android:scrollbars="none"
         android:textSize="24sp" />
 
+    
+
     <Button
-        android:id="@+id/btnExpense"
+        android:id="@+id/btnLogIn"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_above="@+id/btnReturn"
-        android:layout_alignRight="@+id/tveCashShow"
-        android:layout_marginBottom="76dp"
+        android:layout_alignLeft="@+id/tvOTP"
+        android:layout_centerVertical="true"
         android:background="@drawable/rectangle_button"
         android:text="@string/Login"
         android:textSize="15sp" />
 
-    <TextView
-        android:id="@+id/tvVerifyedData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btnExpense"
-        android:layout_marginBottom="54dp"
-        android:layout_toLeftOf="@+id/tvChallengeCode"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/DynamicOrder"
-        android:textSize="24sp" />
+    <ScrollView
+        android:id="@+id/scvOTP"
+        android:layout_width="300dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/btnLogIn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:fadeScrollbars="false"
+        android:scrollbarAlwaysDrawVerticalTrack="true" >
 
-    <Button
-        android:id="@+id/btnRecharge"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_above="@+id/tvResponseCode"
-        android:layout_marginBottom="25dp"
-        android:layout_toLeftOf="@+id/tvChallengeCode"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/GenerateChallenge"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tvShowOTP"
+            android:layout_width="280dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:text="@string/ProcessStatus" />
+
+    </ScrollView>
 
 </RelativeLayout>

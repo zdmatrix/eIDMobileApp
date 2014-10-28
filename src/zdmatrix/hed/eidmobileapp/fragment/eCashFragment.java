@@ -1,5 +1,7 @@
 package zdmatrix.hed.eidmobileapp.fragment;
 
+import java.security.PublicKey;
+
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.eid.eidmobileapp.R;
@@ -95,7 +97,7 @@ public class eCashFragment extends Fragment{
 		
 		tvBanlance = (TextView)view.findViewById(R.id.tvBanlance);
 		
-		tveCashShow = (TextView)view.findViewById(R.id.tveCashShow);
+		tveCashShow = (TextView)view.findViewById(R.id.tveCash);
 		tveCashShow.setMovementMethod(ScrollingMovementMethod.getInstance());
 		
 		scveCash = (ScrollView)view.findViewById(R.id.scveCash);
@@ -124,6 +126,8 @@ public class eCashFragment extends Fragment{
 			if(v == btnReturn){
 				MainFragment mainFragment = new MainFragment();
 				getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, mainFragment).commit();
+				
+				
 			}else{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
@@ -146,9 +150,11 @@ public class eCashFragment extends Fragment{
 		}
 	}
 	
+	
 	public class GetBanlanceThread extends Thread{
 		@Override
 		public void run(){
+
 			resault = FunctionMoudle.readBanlance();
 			if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
 				
@@ -161,8 +167,14 @@ public class eCashFragment extends Fragment{
 				handler.post(runnableDisBanlance);
 				
 			}
+			
+			
 		}
+		
+			
 	}
+	
+	
 	
 	public class RechargeThread extends Thread{
 		@Override
@@ -287,7 +299,7 @@ public class eCashFragment extends Fragment{
 		new Thread(){
 			public void run(){
 				handler.post(runnableDisableOtherButton);
-				Show("确认交易 " + strTradeData + " 元?\r\n请核对卡上显示的交易额度\r\n确认交易请按卡上按钮确认");
+				Show("确认交易 " + strTradeData + " 元?\r\n请核对卡上显示的交易额度\r\n确认交易请按卡上按钮确认\r\n");
 				resault = FunctionMoudle.WaitCardButtonPushed();
 				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){ 
 					resault = FunctionMoudle.upDateBinData(nBanlance);
@@ -299,75 +311,18 @@ public class eCashFragment extends Fragment{
 							e.printStackTrace();
 						}
     					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTradeData, 10), nBanlance, true);
-//    					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-//    						resault[StaticData.nSW] = StaticData.sTRADEDONE;
-//    					}    					
+    					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+    						resault[StaticData.nSW] = StaticData.sTRADEDONE;
+    					}    					
     				}	
 				}
-//				handler.post(runnableDisWarning); 
-				Show(StaticData.sTRADEDONE + "\n\r");
+				handler.post(runnableDisWarning); 
+//				Show(StaticData.sTRADEDONE + "\n\r");
 				handler.post(runnableEnableOtherButton);
 			}
 		}.start();
 	}
-/*	
-	Runnable runnableUpdateBinData = new Runnable() {
-		
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			
-			
-			AlertDialog dlg = new AlertDialog.Builder(getActivity())
-            .setTitle("提示信息")
-            .setMessage("确认交易 " + strTradeData + " 元?\r\n请核对卡上显示的交易额度\r\n确认交易请按卡上按钮确认")
-            .setView(null)//设置自定义对话框的样式
-            .setPositiveButton("确定", //设置"确定"按钮
-            new DialogInterface.OnClickListener() //设置事件监听
-            {
-                public void onClick(DialogInterface dialog, int whichButton) 
-                {
-            		new Thread(){
-            			public void run(){
-            				handler.post(runnableDisableOtherButton);
-            				resault = FunctionMoudle.WaitCardButtonPushed();
-            				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){ 
-            					resault = FunctionMoudle.upDateBinData(nBanlance);
-                				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-                					try {
-										sleep(800);
-									} catch (Exception e) {
-										// TODO: handle exception
-										e.printStackTrace();
-									}
-                					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTradeData, 10), nBanlance, true);
-                					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-                						resault[StaticData.nSW] = StaticData.sTRADEDONE;
-                					}
-                					
-                				}	
-            				}
-            				handler.post(runnableDisWarning); 
-            				handler.post(runnableEnableOtherButton);
-            			}
-            		}.start();
-                }
-            })
-            
-            .setNegativeButton("取消",
-            new DialogInterface.OnClickListener(){
-            	public void onClick(DialogInterface dialog, int whichButton){
-            		;
-            	}
-            }
-            )
-            .create();//创建    			
-            dlg.show();//显示
-            
-            
-		}
-	};
-*/	
+
 	Runnable runnableDisableOtherButton = new Runnable() {
 		
 		@Override
@@ -400,7 +355,15 @@ public class eCashFragment extends Fragment{
 		public void run() {
 		// TODO Auto-generated method stub
 			tveCashShow.setText(strShow);
-			scveCash.scrollTo(0, tveCashShow.getHeight());
+			scveCash.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int offset = Math.abs(tveCashShow.getMeasuredHeight() - scveCash.getMeasuredHeight());
+					scveCash.scrollTo(0, offset);
+				}
+			});
 		}
 
 	};

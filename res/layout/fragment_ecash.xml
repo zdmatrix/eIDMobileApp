@@ -6,20 +6,26 @@
     android:background="@color/LightSteelBlue"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/etRecharge"
-        android:layout_width="100dp"
-        android:layout_height="48dp"
-        android:layout_alignBaseline="@+id/btnRecharge"
-        android:layout_alignBottom="@+id/btnRecharge"
-        android:layout_marginLeft="28dp"
-        android:layout_toRightOf="@+id/btnRecharge"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="numberDecimal" >
-
-        <requestFocus />
-    </EditText>
+    <TextView
+        android:id="@+id/tveCashLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="@string/ElectricMoney"
+        android:textSize="32sp" />
+    <Button
+        android:id="@+id/btnRecharge"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/scveCash"
+        android:layout_below="@id/tveCashLabel"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="31dp"
+        android:background="@drawable/rectangle_button"
+        android:text="@string/Recharge"
+        android:textSize="15sp" />
 
     <Button
         android:id="@+id/btnReturn"
@@ -32,35 +38,13 @@
         android:text="@string/returnmain"
         android:textSize="@dimen/activity_vertical_margin" />
 
-    <TextView
-        android:id="@+id/tvShow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="@string/ElectricMoney"
-        android:textSize="@dimen/main_dimension" />
-
-    <Button
-        android:id="@+id/btnRecharge"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:layout_below="@+id/tvShow"
-        android:layout_marginTop="29dp"
-        android:layout_toLeftOf="@+id/tvShow"
-        android:background="@drawable/rectangle_button"
-        android:text="@string/Recharge"
-        android:textSize="15sp" />
-
     <Button
         android:id="@+id/btnExpense"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:layout_below="@+id/etRecharge"
+        android:layout_alignLeft="@id/btnRecharge"
+        android:layout_below="@id/btnRecharge"
         android:layout_marginTop="18dp"
-        android:layout_toLeftOf="@+id/etRecharge"
         android:background="@drawable/rectangle_button"
         android:text="@string/Consume"
         android:textSize="15sp" />
@@ -69,6 +53,7 @@
         android:id="@+id/btnBanlance"
         android:layout_width="80dp"
         android:layout_height="40dp"
+        android:layout_alignLeft="@id/btnExpense"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/etRecharge"
         android:background="@drawable/rectangle_button"
@@ -81,6 +66,7 @@
         android:layout_height="45dp"
         android:layout_alignLeft="@+id/etExpense"
         android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/btnBanlance"
         android:background="@color/White"
         android:gravity="center"
         android:isScrollContainer="true"
@@ -96,6 +82,7 @@
         android:layout_alignBaseline="@+id/btnExpense"
         android:layout_alignBottom="@+id/btnExpense"
         android:layout_alignLeft="@+id/etRecharge"
+        android:layout_toRightOf="@id/btnExpense"
         android:ems="10"
         android:gravity="center"
         android:inputType="numberDecimal" />
@@ -111,9 +98,10 @@
         android:scrollbarAlwaysDrawVerticalTrack="true" >
 
         <TextView
-            android:id="@+id/tveCashShow"
-            android:layout_width="300dp"
-            android:layout_height="100dp"
+            android:id="@+id/tveCash"
+            android:layout_width="280dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_horizontal"
             android:ellipsize="marquee"
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
@@ -121,6 +109,24 @@
             android:scrollbars="vertical"
             android:singleLine="false"
             android:text="@string/ProcessStatus" />
+
     </ScrollView>
+
+    
+
+    <EditText
+        android:id="@+id/etRecharge"
+        android:layout_width="100dp"
+        android:layout_height="48dp"
+        android:layout_alignBaseline="@id/btnRecharge"
+        android:layout_alignBottom="@id/btnRecharge"
+        android:layout_marginLeft="40dp"
+        android:layout_toRightOf="@id/btnRecharge"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="numberDecimal" >
+
+        <requestFocus />
+    </EditText>
 
 </RelativeLayout>

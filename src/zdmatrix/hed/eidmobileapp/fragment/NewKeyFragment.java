@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,12 +22,13 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class NewKeyFragment extends Fragment{
 	
 	Button btnReturn;
-	Button btnVerifyData;
+	Button btnTransform;
 	Button btnBanlance;
 	
 	ImageView imgSrcAccount;
@@ -38,6 +40,9 @@ public class NewKeyFragment extends Fragment{
 	TextView tvSrcAccount;
 	TextView tvDstAccount;
 	TextView tvBanlance;
+	TextView tvNewKey;
+	
+	ScrollView scvNewKey;
 	
 	Handler handler;
 	
@@ -53,6 +58,7 @@ public class NewKeyFragment extends Fragment{
 	
 	int nRet;
 	int nBanlance;
+	int nOffset;
 	boolean bGetBanlance;
 	
 	String[] resault;
@@ -60,6 +66,8 @@ public class NewKeyFragment extends Fragment{
 	String strAuthCode;
 	String strRandom;
 	String strDisDstAccount;
+	String strShow;
+	
  	
 	@Override
 	public void onCreate(Bundle saveInstancStates){
@@ -70,11 +78,12 @@ public class NewKeyFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstancStates){
 		View view = inflater.inflate(R.layout.fragment_newkey, container, false);
 		
+		
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);
 		btnReturn.setOnClickListener(new ClickEvent());
 		
-		btnVerifyData = (Button)view.findViewById(R.id.btnVerifyData);
-		btnVerifyData.setOnClickListener(new ClickEvent());
+		btnTransform = (Button)view.findViewById(R.id.btnTransform);
+		btnTransform.setOnClickListener(new ClickEvent());
 		
 //		btnOk = (Button)view.findViewById(R.id.btnOk);
 //		btnOk.setOnClickListener(new ClickEvent());
@@ -97,9 +106,12 @@ public class NewKeyFragment extends Fragment{
 				return false;
 			}			
 		});
-		tvDstAccount = (TextView)view.findViewById(R.id.tvBeVerifyedData);
-		tvSrcAccount = (TextView)view.findViewById(R.id.tvSrcAccount);
+		tvDstAccount = (TextView)view.findViewById(R.id.tvDstAccountHint);
+		tvSrcAccount = (TextView)view.findViewById(R.id.tvSrcAccountHint);
 		tvBanlance = (TextView)view.findViewById(R.id.tvBanlance);
+		tvNewKey = (TextView)view.findViewById(R.id.tvNewKey);
+		tvNewKey.setMovementMethod(ScrollingMovementMethod.getInstance());
+		scvNewKey = (ScrollView)view.findViewById(R.id.scvNewKey);
 		
 		handler = new Handler();
 		
@@ -130,7 +142,9 @@ public class NewKeyFragment extends Fragment{
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
 					if(v == btnBanlance){
 						new GetBanlanceThread().start();
-					}else if(v == btnVerifyData){
+					}else if(v == btnTransform){
+						strShow = "";
+						nOffset = 0;
 						new VerifyDataThread().start();
 					}
 				}else{
@@ -170,7 +184,8 @@ public class NewKeyFragment extends Fragment{
 						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTransformer, 10), Integer.parseInt(strDisDstAccount, 10), true);
 							if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
     						nBanlance = n;
-    						handler.post(runnableVerifyData);
+//    						handler.post(runnableVerifyData);
+    						Transform();
         				}else{
         					handler.post(runnableDisWarning);
         				}
@@ -246,6 +261,62 @@ public class NewKeyFragment extends Fragment{
             dlg.show();//显示
 		}
 	};
+	
+	public void Transform(){
+		new Thread(){
+			public void run(){
+				handler.post(runnableDisableOtherButton);
+				Show("确认交易 " + strTransformer + " 元?\r\n请核对卡上显示的交易额度和目的帐号\r\n确认请按卡上按钮确认，卡片根据交易信息生成认证码\r\n");
+				resault = FunctionMoudle.WaitCardButtonPushed();
+				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+					byte[] r = new byte[6];
+					strRandom = "";
+					for(int i = 0; i < r.length; i ++){
+						r[i] = (byte)(Math.random() * 10);
+						strRandom += String.format("%1$1d", (byte)r[i]);
+					}					
+//					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strDisDstAccount, 10), Integer.parseInt(strRandom, 10), true);
+					resault = FunctionMoudle.DisplayOnCard(nBanlance, Integer.parseInt(strRandom, 10), true);
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						bSrcAccount = FunctionMoudle.getImageData(tvSrcAccount.getHint().toString());
+						bDstAccount = FunctionMoudle.getImageData(tvDstAccount.getHint().toString());
+						bAuthCode = FunctionMoudle.getImageData(strRandom);
+						bTransformerAmount = FunctionMoudle.getImageData(strTransformer);            						
+						handler.post(runnableDisImg);
+//						handler.post(runnableConfirmTransfor);
+						ConfirmTransform();
+    				}else{
+    					handler.post(runnableDisWarning);  
+    				}	
+					
+				}else{
+					handler.post(runnableDisWarning);
+				}
+				handler.post(runnableEnableOtherButton);            				                      	
+			}
+		}.start();
+	}
+	
+	public void ConfirmTransform(){
+		new Thread(){
+			public void run(){
+				handler.post(runnableDisableOtherButton);
+				Show("请核对卡上显示的认证码与手机上图片显示一致\r\n确认交易请再次按卡上按钮确认");
+				resault = FunctionMoudle.WaitCardButtonPushed();
+				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+					resault = FunctionMoudle.upDateBinData(nBanlance);
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						resault = FunctionMoudle.DisplayOnCard(StaticData.nSHOWNONEONCARD, 0, false);
+						if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+							resault[StaticData.nSW] = StaticData.sTRADEDONE;
+						}           						
+					}					
+				}
+				handler.post(runnableDisWarning); 
+				handler.post(runnableEnableOtherButton);
+			}
+		}.start();
+	}
 	
 	Runnable runnableVerifyData = new Runnable() {
 		
@@ -365,7 +436,7 @@ public class NewKeyFragment extends Fragment{
 		public void run() {
 		// TODO Auto-generated method stub
 			btnBanlance.setEnabled(false);
-			btnVerifyData.setEnabled(false);
+			btnTransform.setEnabled(false);
 			btnReturn.setEnabled(false);
 		}
 
@@ -377,9 +448,35 @@ public class NewKeyFragment extends Fragment{
 		public void run() {
 		// TODO Auto-generated method stub
 			btnBanlance.setEnabled(true);
-			btnVerifyData.setEnabled(true);
+			btnTransform.setEnabled(true);
 			btnReturn.setEnabled(true);
 		}
 
 	};
+	
+	Runnable runnableShow = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			tvNewKey.setText(strShow);
+			scvNewKey.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int offset = Math.abs(tvNewKey.getMeasuredHeight() - scvNewKey.getMeasuredHeight());
+					scvNewKey.scrollTo(0, offset);
+				}
+			});
+		}
+
+	};
+	
+	public void Show(String msg){
+		strShow += msg;
+		handler.post(runnableShow);
+	}
+	
+	
 }

@@ -42,18 +42,6 @@
         android:text="@string/otp"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/tveCashShow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/imgSrcAccount"
-        android:layout_centerHorizontal="true"
-        android:text="@string/mainlable"
-        android:textColor="@color/Black"
-        android:textSize="@dimen/main_dimension"
-        android:textStyle="bold"
-        android:typeface="monospace" />
-
     <ImageView
         android:id="@+id/imgSrcAccount"
         android:layout_width="fill_parent"
@@ -82,13 +70,22 @@
         android:text="@string/eID"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/tvMainLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgSrcAccount"
+        android:layout_centerHorizontal="true"
+        android:text="@string/mainlable"
+        android:textSize="32sp" />
+
     <Button
         android:id="@+id/btnTest"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_alignLeft="@+id/btneCash"
-        android:layout_below="@+id/tveCashShow"
-        android:layout_marginTop="29dp"
+        android:layout_below="@+id/tvMainLabel"
+        android:layout_marginTop="16dp"
         android:background="@drawable/ellipse_button"
         android:text="@string/test"
         android:textSize="16sp" />

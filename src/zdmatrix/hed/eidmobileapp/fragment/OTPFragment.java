@@ -14,12 +14,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class OTPFragment extends Fragment{
@@ -30,6 +32,9 @@ public class OTPFragment extends Fragment{
 	
 	TextView tvChallengeCode;
 	TextView tvResponseCode;
+	TextView tvShowOTP;
+	
+	ScrollView scvOTP;
 	
 	Handler handler;
 	
@@ -38,6 +43,7 @@ public class OTPFragment extends Fragment{
 	String strResponseCode;
 	String[] resault;
 	String strRandom;
+	String strShow;
 	byte[] bRandom;
 	
 	int nRet;
@@ -51,20 +57,25 @@ public class OTPFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		View view = inflater.inflate(R.layout.fragment_otp, container, false);
 		
-		btnChallengeCode = (Button)view.findViewById(R.id.btnRecharge);
+		btnChallengeCode = (Button)view.findViewById(R.id.btnGenerateChalenge);
 		btnChallengeCode.setOnClickListener(new ClickEvent());
 		
 		btnReturn = (Button)view.findViewById(R.id.btnReturn);
 		btnReturn.setOnClickListener(new ClickEvent());
 		
-		btnLogIn = (Button)view.findViewById(R.id.btnExpense);
+		btnLogIn = (Button)view.findViewById(R.id.btnLogIn);
 		btnLogIn.setOnClickListener(new ClickEvent());
 		
 		tvChallengeCode = (TextView)view.findViewById(R.id.tvChallengeCode);
+		tvResponseCode = (TextView)view.findViewById(R.id.tvResponseCode);
+		tvShowOTP = (TextView)view.findViewById(R.id.tvShowOTP);
+		tvShowOTP.setMovementMethod(ScrollingMovementMethod.getInstance());
+		
+		scvOTP = (ScrollView)view.findViewById(R.id.scvOTP);
 		
 		handler = new Handler();
 		
-		tvResponseCode = (TextView)view.findViewById(R.id.tvResponseCode);
+		
 		
 		resault = new String[]{"", ""};
 		bRandom = new byte[6];
@@ -82,8 +93,10 @@ public class OTPFragment extends Fragment{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
 					if(v == btnChallengeCode){
+						strShow = "";
 						new GenerateChallengeCodeThread().start();
 					}else if(v == btnLogIn){
+						strShow = "";
 						new LogInThread().start();
 					}
 					
@@ -105,7 +118,7 @@ public class OTPFragment extends Fragment{
 				bRandom[i] = (byte)(Math.random() * 10);
 				strRandom += String.format("%1$1d", (byte)bRandom[i]);
 			}
-			handler.post(runnableDisRandom);
+			handler.post(runnableDisRandom);			
 			handler.post(runnableEnableOtherButton);
 			
 		}
@@ -118,19 +131,49 @@ public class OTPFragment extends Fragment{
 		}
 	}
 	
-	
 	Runnable runnableDisRandom = new Runnable(){
 		@Override
 		public void run(){
 			tvChallengeCode.setText(strRandom);
 			resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), 0, false);
 			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
-				handler.post(runnableGenerateResponseCode);
+//				handler.post(runnableGenerateResponseCode);
+				OTP();
 			}else {
 				handler.post(runnableDisWarning);
 			}
 		}
 	};
+	
+	public void OTP(){
+		new Thread(){
+			public void run(){
+				handler.post(runnableDisableOtherButton);
+				Show("请核对卡上显示的挑战码和手机收到的挑战码是否一致\r\n确定后请按卡上按钮生成应答码\r\n");
+				resault = FunctionMoudle.WaitCardButtonPushed();
+				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+					strResponseCode = "";
+					for(int i = 0; i < bRandom.length; i ++){
+						bRandom[i] = (byte)(Math.random() * 10);
+						strResponseCode += String.format("%1$1d", (byte)bRandom[i]);
+					}
+					int line1 = Integer.parseInt(strRandom, 10);
+					int line2 = Integer.parseInt(strResponseCode, 10);
+					resault = FunctionMoudle.DisplayOnCard(line1, line2, true);
+    				handler.post(runnableResponseCode);
+					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+//						handler.post(runnableConfirm);
+						Show("请核对卡上显示的应答码和手机收到的应答码是否一致\r\n确定后请按手机上登录按钮登录\r\n");
+    				}else{
+    					handler.post(runnableDisWarning);
+    				}	
+				}else{
+					handler.post(runnableDisWarning); 
+				}
+				handler.post(runnableEnableOtherButton);           				                      	
+			}
+		}.start();
+	}
 	
 	Runnable runnableDisWarning = new Runnable() {
 		
@@ -306,4 +349,28 @@ public class OTPFragment extends Fragment{
 		}
 
 	};
+	
+	Runnable runnableShow = new Runnable() {
+		
+		@Override
+		public void run() {
+		// TODO Auto-generated method stub
+			tvShowOTP.setText(strShow);
+			scvOTP.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					int offset = Math.abs(tvShowOTP.getMeasuredHeight() - scvOTP.getMeasuredHeight());
+					scvOTP.scrollTo(0, offset);
+				}
+			});
+		}
+
+	};
+	
+	public void Show(String msg){
+		strShow += msg;
+		handler.post(runnableShow);
+	}
 }
