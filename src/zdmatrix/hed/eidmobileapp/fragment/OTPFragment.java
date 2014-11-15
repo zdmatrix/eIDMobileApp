@@ -8,6 +8,9 @@ import mafei.hed.nfcapplication.NFCMsgCode;
 
 import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.fragment.eCashFragment.ExpenseThread;
+import zdmatrix.hed.eidmobileapp.fragment.eCashFragment.GetBanlanceThread;
+import zdmatrix.hed.eidmobileapp.fragment.eCashFragment.RechargeThread;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -92,13 +95,21 @@ public class OTPFragment extends Fragment{
 			}else{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
-					if(v == btnChallengeCode){
-						strShow = "";
-						new GenerateChallengeCodeThread().start();
-					}else if(v == btnLogIn){
-						strShow = "";
-						new LogInThread().start();
+					String str = FunctionMoudle.SelectApplet(StaticData.nEIDAPPLET);
+					resault = FunctionMoudle.APDUResponseProcess(str);
+					if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						resault[StaticData.nSW] = "无法选中eID Applet！";
+						handler.post(runnableDisWarning);
+					}else{
+						if(v == btnChallengeCode){
+							strShow = "";
+							new GenerateChallengeCodeThread().start();
+						}else if(v == btnLogIn){
+							strShow = "";
+							new LogInThread().start();
+						}
 					}
+					
 					
 				}else{
 					resault = FunctionMoudle.ErrorProcess(nRet);
@@ -135,7 +146,8 @@ public class OTPFragment extends Fragment{
 		@Override
 		public void run(){
 			tvChallengeCode.setText(strRandom);
-			resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), 0, false);
+//			resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), 0, false);
+			resault = FunctionMoudle.Display(strRandom, null, false);
 			if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 //				handler.post(runnableGenerateResponseCode);
 				OTP();
@@ -157,9 +169,10 @@ public class OTPFragment extends Fragment{
 						bRandom[i] = (byte)(Math.random() * 10);
 						strResponseCode += String.format("%1$1d", (byte)bRandom[i]);
 					}
-					int line1 = Integer.parseInt(strRandom, 10);
-					int line2 = Integer.parseInt(strResponseCode, 10);
-					resault = FunctionMoudle.DisplayOnCard(line1, line2, true);
+//					int line1 = Integer.parseInt(strRandom, 10);
+//					int line2 = Integer.parseInt(strResponseCode, 10);
+//					resault = FunctionMoudle.DisplayOnCard(line1, line2, true);
+					resault = FunctionMoudle.Display(strRandom, strResponseCode, true);
     				handler.post(runnableResponseCode);
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 //						handler.post(runnableConfirm);

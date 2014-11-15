@@ -3,6 +3,8 @@ package zdmatrix.hed.eidmobileapp.functionmoudle;
 
 import java.util.Random;
 
+import android.R.string;
+
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
@@ -13,6 +15,23 @@ public class FunctionMoudle {
 	private static final byte SECONDLINE = 0x02;
 	private static final byte SELECTFILEAPDULEN = 0x07;
 	private static final byte UPDATEBINDATEAPDULEN = 0x09;
+	
+	
+	
+	public static String SelectApplet(int appletindex){
+		String strRet = new String();
+		switch (appletindex) {
+		case StaticData.nEIDAPPLET:
+			
+			strRet = APDUCmd(StaticData.bSELECTEIDAPPLET);
+			break;
+
+		default:
+			break;
+		}
+		
+		return strRet;
+	}
 	
 	public static String[] ErrorProcess(int n){
 		String[] strRet = new String[StaticData.nRETURNSTRINGARRAYLEN]; 
@@ -363,22 +382,22 @@ public class FunctionMoudle {
 	public static String[] eIDAuthen(){
 				
 		String[] strRet = new String[]{"", ""};
-		
+/*		
 		strRet = InstallRSAKey();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
-/*		
+		
 		strRet = ExportPublicKey();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
-	*/	
+		
 		strRet = VerifyCertData();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
-		
+*/		
 		strRet = RSAPrivateKeySign();
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
@@ -388,6 +407,7 @@ public class FunctionMoudle {
 		if(!strRet[StaticData.nSW].equals(StaticData.sSWOK)){
 			return strRet;
 		}
+		
 		return strRet;
 	}
 	

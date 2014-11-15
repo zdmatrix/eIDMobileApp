@@ -83,12 +83,20 @@ public class TestFragment extends Fragment{
 				nClickCount ++;
 				nRet = NFCApplication.isConnectTag(intent);
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
-					if(v == btnGetRandom){
-						new GetRandomThread().start();
+					String str = FunctionMoudle.SelectApplet(StaticData.nEIDAPPLET);
+					resault = FunctionMoudle.APDUResponseProcess(str);
+					if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						resault[StaticData.nSW] = "无法选中eID Applet！";
+						handler.post(runnableDisResault);
+					}else{
+						if(v == btnGetRandom){
+							new GetRandomThread().start();
+						}
+						if(v == btnWrite){
+							new WriteThread().start();
+						}
 					}
-					if(v == btnWrite){
-						new WriteThread().start();
-					}
+					
 				}else{
 					resault = FunctionMoudle.ErrorProcess(nRet);
 					handler.post(runnableDisResault);

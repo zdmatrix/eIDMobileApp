@@ -28,6 +28,8 @@ public class StaticData {
 	public static final int nEXPENSE = 0x2001;
 	public static final int nREADBANLANCE = 0x2002;
 	
+	public static final int nEIDAPPLET = 0x3001;
+	
 	
 	
 	public static final int NUM0[]  = { 7, 1, 2, 4, 6, 5, 3, 1 };
@@ -87,6 +89,9 @@ public class StaticData {
 	public static final String sWRITEAPDU = "80bf0100";
 	public static final byte[] bWRITELINEAPDU = {(byte)0x80, (byte)0xbf, 0x01, 0x00, 0x00};				//bWRITELINEAPDU[3] = 0x01,means first line
 																										//bWRITELINEAPDU[3] = 0x02,means second line
+	
+	public static final byte[] bSELECTEIDAPPLET = {0x00, (byte)0xA4, 0x00, 0x00, 0x08, (byte)0xA0, 0x00, 0x00, 0x00, 0x03, 0x45, 0x49, 0x44};
+	
 	public static final byte[] bSHOWNONEONFIRSTLINE = {(byte)0x80, (byte)0xbf, 0x01, 0x01, 0x09, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20};
 	public static final byte[] bSHOWNONEONSECONDLINE = {(byte)0x80, (byte)0xbf, 0x01, 0x02, 0x09, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20, (byte)0x20};
 	public static final byte[] bDISPLAYONCARD = {(byte)0x80, (byte)0xBF, 0x01, 0x03, 0x00};
@@ -153,7 +158,6 @@ public class StaticData {
 	public static final byte[] bFETCHAUTHCODE = {0x00, (byte)0xc0, 0x00, 0x00, 0x06};
 	
 	public static final byte[] bWAITCARDBUTTONPUSHED = {(byte)0x80, (byte)0xbf, 0x06, 0x00, 0x00};	
-	public static final byte[] bSELECTEIDAPPLET = {0x00, (byte)0xa4, 0x00, 0x00, 0x08, (byte)0xA0, 0x00, 0x00, 0x00, 0x03 ,0x45, 0x49, 0x44, 0x00};
 	
 	public static final String sGENERATERSAKEY = "0042000008C0020000C202A0F2";
 	

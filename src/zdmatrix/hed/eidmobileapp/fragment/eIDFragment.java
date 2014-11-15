@@ -4,6 +4,8 @@ import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.fragment.TestFragment.GetRandomThread;
+import zdmatrix.hed.eidmobileapp.fragment.TestFragment.WriteThread;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 
 
@@ -15,11 +17,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -99,8 +99,16 @@ public class eIDFragment extends Fragment{
 				if(v == btneIDVerify){
 					nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 					if(nRet == NFCMsgCode.nTAG_CONNECT){
-						strShow = "";
-						new VerifyThread().start();
+						String str = FunctionMoudle.SelectApplet(StaticData.nEIDAPPLET);
+						resault = FunctionMoudle.APDUResponseProcess(str);
+						if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+							resault[StaticData.nSW] = "无法选中eID Applet！";
+							handler.post(runnableDisWarning);
+						}else{
+							strShow = "";
+							new VerifyThread().start();
+						}
+						
 					}else{
 						resault = FunctionMoudle.ErrorProcess(nRet);
 						handler.post(runnableDisWarning);
@@ -230,6 +238,28 @@ public class eIDFragment extends Fragment{
 		handler.post(runnableDisableOtherButton);
 		resault = FunctionMoudle.WaitCardButtonPushed();
 		if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+			Show(" 卡上按键按下\r\n开始eID认证……\r\n");
+			
+			
+			
+				
+				resault = FunctionMoudle.eIDAuthen();
+				if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
+//					Show(" eID认证成功！\r\n");
+					byte[] r = new byte[8];
+					strRetRandom = "";
+					for(int i = 0; i < r.length; i ++){
+						r[i] = (byte)(Math.random() * 10);
+						strRetRandom += String.format("%1$1x", (byte)r[i]);
+					}
+					handler.post(runnableDisRetRandom);
+					resault = FunctionMoudle.Display(strRandom, strRetRandom, true);
+//					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
+					resault[StaticData.nSW] = " 认证成功!";
+					Show(" eID认证成功！\r\n");										
+				}
+			
+/*
 			Show(" 卡上按键按下\r\n开始卡个人化……\r\n");
 			resault = FunctionMoudle.eIDPersonalized();
 			
@@ -245,13 +275,15 @@ public class eIDFragment extends Fragment{
 						strRetRandom += String.format("%1$1x", (byte)r[i]);
 					}
 					handler.post(runnableDisRetRandom);
-
-					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
+					resault = FunctionMoudle.Display(strRandom, strRetRandom, true);
+//					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
 					resault[StaticData.nSW] = " 认证成功!";
 					Show(" eID认证成功！\r\n");										
 				}
 			}
+			*/
 		}
+		
 		handler.post(runnableDisWarning);
 		handler.post(runnableEnableOtherButton);
 	}
@@ -278,8 +310,8 @@ public class eIDFragment extends Fragment{
 							strRetRandom += String.format("%1$1x", (byte)r[i]);
 						}
 						handler.post(runnableDisRetRandom);
-
-						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
+						resault = FunctionMoudle.Display(strRandom, strRetRandom, true);
+//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRandom, 10), Integer.parseInt(strRetRandom, 10), true);
 						resault[StaticData.nSW] = " 认证成功!";
 //						Show("eID认证成功！\r\n");										
 					}

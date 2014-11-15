@@ -4,6 +4,7 @@ import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.fragment.eIDFragment.VerifyThread;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -140,12 +141,21 @@ public class NewKeyFragment extends Fragment{
 			}else{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
-					if(v == btnBanlance){
-						new GetBanlanceThread().start();
-					}else if(v == btnTransform){
-						strShow = "";
-						nOffset = 0;
-						new VerifyDataThread().start();
+					if(nRet == NFCMsgCode.nTAG_CONNECT){
+						String str = FunctionMoudle.SelectApplet(StaticData.nEIDAPPLET);
+						resault = FunctionMoudle.APDUResponseProcess(str);
+						if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+							resault[StaticData.nSW] = "无法选中eID Applet！";
+							handler.post(runnableDisWarning);
+						}else{
+							if(v == btnBanlance){
+								new GetBanlanceThread().start();
+							}else if(v == btnTransform){
+								strShow = "";
+								nOffset = 0;
+								new VerifyDataThread().start();
+							}
+						}
 					}
 				}else{
 					resault = FunctionMoudle.ErrorProcess(nRet);
@@ -179,9 +189,8 @@ public class NewKeyFragment extends Fragment{
 						handler.post(runnableDisWarning);
 					}else{
 						strDisDstAccount = tvDstAccount.getHint().toString().substring(StaticData.nSUBACCOUNTSTARTINDEX, StaticData.nSUBACCOUNTENDINDEX);
-//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(etTransformerAmount.getText().toString(), 10), Integer.parseInt(strTransformer, 10), true);
-						
-						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTransformer, 10), Integer.parseInt(strDisDstAccount, 10), true);
+						resault = FunctionMoudle.Display(strTransformer, strDisDstAccount, true);	
+//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strTransformer, 10), Integer.parseInt(strDisDstAccount, 10), true);
 							if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
     						nBanlance = n;
 //    						handler.post(runnableVerifyData);
@@ -276,7 +285,7 @@ public class NewKeyFragment extends Fragment{
 						strRandom += String.format("%1$1d", (byte)r[i]);
 					}					
 //					resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strDisDstAccount, 10), Integer.parseInt(strRandom, 10), true);
-					resault = FunctionMoudle.DisplayOnCard(nBanlance, Integer.parseInt(strRandom, 10), true);
+					resault = FunctionMoudle.Display(String.format("%1$d", nBanlance), strRandom, true);
 					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
 						bSrcAccount = FunctionMoudle.getImageData(tvSrcAccount.getHint().toString());
 						bDstAccount = FunctionMoudle.getImageData(tvDstAccount.getHint().toString());

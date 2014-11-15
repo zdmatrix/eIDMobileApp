@@ -1,11 +1,11 @@
 package zdmatrix.hed.eidmobileapp.fragment;
 
-import java.security.PublicKey;
-
 import mafei.hed.nfcapplication.NFCApplication;
 import mafei.hed.nfcapplication.NFCMsgCode;
 import zdmatrix.hed.eid.eidmobileapp.R;
 import zdmatrix.hed.eidmobileapp.data.StaticData;
+import zdmatrix.hed.eidmobileapp.fragment.TestFragment.GetRandomThread;
+import zdmatrix.hed.eidmobileapp.fragment.TestFragment.WriteThread;
 import zdmatrix.hed.eidmobileapp.functionmoudle.FunctionMoudle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -131,16 +131,24 @@ public class eCashFragment extends Fragment{
 			}else{
 				nRet = NFCApplication.isConnectTag(getActivity().getIntent());
 				if(nRet == NFCMsgCode.nTAG_CONNECT){
-					if(v == btnRecharge){
-						strShow = "";
-						new RechargeThread().start();
-					}else if(v == btnExpense){
-						strShow = "";
-						new ExpenseThread().start();
-					}else if(v == btnBanlance){
-						strShow = "";
-						new GetBanlanceThread().start();
+					String str = FunctionMoudle.SelectApplet(StaticData.nEIDAPPLET);
+					resault = FunctionMoudle.APDUResponseProcess(str);
+					if(!resault[StaticData.nSW].equals(StaticData.sSWOK)){
+						resault[StaticData.nSW] = "无法选中eID Applet！";
+						handler.post(runnableDisWarning);
+					}else{
+						if(v == btnRecharge){
+							strShow = "";
+							new RechargeThread().start();
+						}else if(v == btnExpense){
+							strShow = "";
+							new ExpenseThread().start();
+						}else if(v == btnBanlance){
+							strShow = "";
+							new GetBanlanceThread().start();
+						}
 					}
+					
 					
 				}else{
 					resault = FunctionMoudle.ErrorProcess(nRet);
@@ -200,7 +208,8 @@ public class eCashFragment extends Fragment{
 						resault[StaticData.nSW] = StaticData.sOVERECASHLIMIT;
 						handler.post(runnableDisWarning);
 					}else{
-						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRechargeData, 10), 0, false);
+//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strRechargeData, 10), 0, false);
+						resault = FunctionMoudle.Display(strRechargeData, null, false);
     					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
     						nBanlance = n;
     						strTradeData = strRechargeData;
@@ -243,7 +252,8 @@ public class eCashFragment extends Fragment{
 						resault[StaticData.nSW] = StaticData.sOVERBANLANCE;
 						handler.post(runnableDisWarning);
 					}else{
-						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strExpenseData, 10), 0, false);
+//						resault = FunctionMoudle.DisplayOnCard(Integer.parseInt(strExpenseData, 10), 0, false);
+						resault = FunctionMoudle.Display(strExpenseData, null, false);
     					if(resault[StaticData.nSW].equals(StaticData.sSWOK)){
     						nBanlance = n;
     						strTradeData = strExpenseData;
